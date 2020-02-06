@@ -7,12 +7,12 @@ class Tag():
     __x = 0
     __y = 0
 
-    def __init__(self):
-        self.__tag = tk.Label(text="this is label", bg="green")
-        self.__x = 39
-        self.__y = 67
+    def __init__(self, x, y, picPhoto):
+        self.__tag = tk.Label(image=picPhoto, bg='#00ff00')
+        self.__tag.image = picPhoto  # avoid garbage collection(避免資源被回收)
+        self.__x = x
+        self.__y = y
         self.__tag.place(x=self.__x, y=self.__y)
-        #self.__tag.bind('<Button-1>', self.click)
 
     def Relocate(self, para):
         # 取出KV結構內資料待處理
@@ -35,6 +35,3 @@ class Tag():
         # 重新定位tag的位置
         self.__tag.place(x=self.__x * ratioWidth + offsetX,
                          y=self.__y * ratioHeight + offsetY)
-
-    # def click(self,event):
-    #    print('OKOKOKOK')
