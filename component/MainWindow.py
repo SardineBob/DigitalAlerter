@@ -1,6 +1,6 @@
 import tkinter as tk
 from component.Map import Map
-from component.Tag import Tag
+from component.AlertTag import AlertTag
 
 
 class MainWindow():
@@ -10,7 +10,7 @@ class MainWindow():
     __curHeight = __originHeight
     __mainWindow = None
     __map = None
-    __tag = None
+    __alertTag = None
 
     def __init__(self):
         # 準備主要視窗設定
@@ -24,7 +24,7 @@ class MainWindow():
         self.__map = Map()
         self.__map.Create(self.__originWidth, self.__originHeight)
         # 產生保全器材標籤位置
-        self.__tag = Tag()
+        self.__alertTag = AlertTag()  # 警報點
         # 開啟視窗
         self.__mainWindow.mainloop()
 
@@ -36,7 +36,7 @@ class MainWindow():
                 # 觸發執行Map Resize動作
                 self.__map.Create(event.width, event.height)
                 # 重新定位保全器材標籤位置
-                self.__tag.Relocate({
+                self.__alertTag.Relocate({
                     'curWindowWidth': event.width,
                     'curWindowHeight': event.height,
                     'oriWindowWidth': self.__originWidth,
