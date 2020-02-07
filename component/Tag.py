@@ -5,13 +5,15 @@ class Tag():
 
     __canvas = None
     __tagid = None
+    __pointid = None
     __x = 0
     __y = 0
 
-    def __init__(self, canvas, x, y, picPhoto, tagName):
+    def __init__(self, canvas, pointid, x, y, picPhoto, tagName):
         self.__canvas = canvas
         self.__x = x
         self.__y = y
+        self.__pointid = pointid
         self.__tagid = canvas.create_image(
             x, y, image=picPhoto, anchor=tk.NW, tags=tagName)
 

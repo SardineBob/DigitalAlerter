@@ -1,9 +1,11 @@
 import tkinter as tk
+from component.ConfigUtil import ConfigUtil
 from component.Map import Map
 from component.AlertTag import AlertTag
 
 
 class MainWindow():
+    __configUtil = None
     __originWidth = 640
     __originHeight = 480
     __curWidth = __originWidth
@@ -11,7 +13,7 @@ class MainWindow():
     __mainWindow = None
     __canvas = None
     __map = None
-    __alertTag = None
+    __alertTags = []
 
     def __init__(self):
         # 準備主要視窗設定
@@ -21,6 +23,8 @@ class MainWindow():
             self.__originWidth, self.__originHeight))
         # 註冊視窗事件
         self.__mainWindow.bind('<Configure>', self.__windowResize)
+        # 讀取保全器材位置設定檔
+        self.__configUtil = ConfigUtil()
         # 產生繪圖物件
         self.__canvas = tk.Canvas(
             width=self.__curWidth, height=self.__curHeight, bg="black")
@@ -28,8 +32,10 @@ class MainWindow():
         # 產生地圖物件
         self.__map = Map(self.__canvas)
         self.__map.Draw(self.__originWidth, self.__originHeight)
-        # 產生保全器材標籤位置
-        self.__alertTag = AlertTag(self.__canvas, 100, 100)  # 警報點
+        # 產生保全器材(警報點)標籤位置
+        for item in self.__configUtil.AlertPoints:
+            self.__alertTags.append(
+                AlertTag(self.__canvas, item["number"], item["X"], item["Y"]))
         # 開啟視窗
         self.__mainWindow.mainloop()
 
@@ -49,7 +55,8 @@ class MainWindow():
                     'oriMapWidth': self.__map.mapOriginWidth,
                     'oriMapHeight': self.__map.mapOriginHeight
                 }
-                self.__alertTag.Relocate(para)
+                for item in self.__alertTags:
+                    item.Relocate(para)
                 # 更新目前視窗寬高
                 self.__curWidth = event.width
                 self.__curHeight = event.height
