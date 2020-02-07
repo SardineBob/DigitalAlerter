@@ -3,16 +3,17 @@ import tkinter as tk
 
 class Tag():
 
-    __tag = None
+    __canvas = None
+    __tagid = None
     __x = 0
     __y = 0
 
-    def __init__(self, x, y, picPhoto):
-        self.__tag = tk.Label(image=picPhoto, bg='#00ff00')
-        self.__tag.image = picPhoto  # avoid garbage collection(避免資源被回收)
+    def __init__(self, canvas, x, y, picPhoto, tagName):
+        self.__canvas = canvas
         self.__x = x
         self.__y = y
-        self.__tag.place(x=self.__x, y=self.__y)
+        self.__tagid = canvas.create_image(
+            x, y, image=picPhoto, anchor=tk.NW, tags=tagName)
 
     def Relocate(self, para):
         # 取出KV結構內資料待處理
@@ -33,5 +34,6 @@ class Tag():
         offsetY = 0 if curWindowHeight <= oriMapHeight \
             else (curWindowHeight - oriMapHeight) / 2
         # 重新定位tag的位置
-        self.__tag.place(x=self.__x * ratioWidth + offsetX,
-                         y=self.__y * ratioHeight + offsetY)
+        self.__canvas.coords(self.__tagid,
+                             self.__x * ratioWidth + offsetX,
+                             self.__y * ratioHeight + offsetY)
