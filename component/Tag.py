@@ -3,30 +3,30 @@ import tkinter as tk
 
 class Tag():
 
-    __canvas = None
-    __tagid = None
-    __bgid = None
-    __pointid = None
-    __tagX = 0
-    __tagY = 0
-    __tagW = 0
-    __tagH = 0
+    canvas = None
+    tagid = None
+    bgid = None
+    pointid = None
+    tagX = 0
+    tagY = 0
+    tagW = 0
+    tagH = 0
 
     def __init__(self, canvas, pointid, x, y, picPhoto, tagName):
-        self.__canvas = canvas
-        self.__pointid = pointid
-        self.__tagX = x
-        self.__tagY = y
-        self.__tagW = picPhoto.width()
-        self.__tagH = picPhoto.height()
+        self.canvas = canvas
+        self.pointid = pointid
+        self.tagX = x
+        self.tagY = y
+        self.tagW = picPhoto.width()
+        self.tagH = picPhoto.height()
         # 先繪製Tag背景圓型，並預設為綠色(警報時為紅色)(__getBGCoords=>計算微調背景圓型在tag的位置)
-        self.__bgid = canvas.create_oval(
-            self.__getBGCoords(self.__tagX, self.__tagY),
+        self.bgid = canvas.create_oval(
+            self.getBGCoords(self.tagX, self.tagY),
             fill='#00ff00',
             tags=tagName
         )
         # 繪製Tag圖示
-        self.__tagid = canvas.create_image(
+        self.tagid = canvas.create_image(
             x, y, image=picPhoto, anchor=tk.NW, tags=tagName)
 
     def Relocate(self, para):
@@ -48,19 +48,19 @@ class Tag():
         offsetY = 0 if curWindowHeight <= oriMapHeight \
             else (curWindowHeight - oriMapHeight) / 2
         # 重新定位tag(包含背景)的位置
-        newX = self.__tagX * ratioWidth + offsetX
-        newY = self.__tagY * ratioHeight + offsetY
-        self.__canvas.coords(self.__tagid, newX, newY)
-        self.__canvas.coords(
-            self.__bgid,
-            self.__getBGCoords(newX, newY)
+        newX = self.tagX * ratioWidth + offsetX
+        newY = self.tagY * ratioHeight + offsetY
+        self.canvas.coords(self.tagid, newX, newY)
+        self.canvas.coords(
+            self.bgid,
+            self.getBGCoords(newX, newY)
         )
 
     # 計算Tag背景的圓型位置，這邊只是微調一下，讓畫面好看
-    def __getBGCoords(self, tagX, tagY):
+    def getBGCoords(self, tagX, tagY):
         return (
             tagX - 1,
             tagY + 1,
-            tagX + self.__tagW,
-            tagY + 1 + self.__tagH
+            tagX + self.tagW,
+            tagY + 1 + self.tagH
         )
