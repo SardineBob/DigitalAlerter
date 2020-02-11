@@ -36,6 +36,18 @@ class MainWindow():
         for item in self.__configUtil.AlertPoints:
             self.__alertTags.append(
                 AlertTag(self.__canvas, item["number"], item["X"], item["Y"]))
+
+        # 給兩個按鈕來測試閃爍
+        def click1():
+            self.__alertTags[2].TriggerAlert()
+        def click2():
+            self.__alertTags[2].TriggerStop()
+        
+        button1 = tk.Button(text='啟動', command=click1)
+        button1.place(x=10, y=10)
+        button2 = tk.Button(text='停止', command=click2)
+        button2.place(x=50, y=10)
+
         # 開啟視窗
         self.__mainWindow.mainloop()
 
