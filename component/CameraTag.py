@@ -18,3 +18,8 @@ class CameraTag(Tag):
         canvas.cameraIcon.append(picPhoto)
         # 傳入父類別，建立攝影機標籤物件
         super().__init__(canvas, pointid, x, y, picPhoto, 'camera')
+        # 綁定Click事件到全部擁有camera這個tags的物件
+        canvas.tag_bind(self.tagid, '<Button-1>', self.__CameraClickEvent)
+
+    def __CameraClickEvent(self, event):
+        print(self.pointid)
