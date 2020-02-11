@@ -2,6 +2,7 @@ import tkinter as tk
 from component.ConfigUtil import ConfigUtil
 from component.Map import Map
 from component.AlertTag import AlertTag
+from component.CameraTag import CameraTag
 
 
 class MainWindow():
@@ -14,6 +15,7 @@ class MainWindow():
     __canvas = None
     __map = None
     __alertTags = []
+    __cameraTags = []
 
     def __init__(self):
         # 準備主要視窗設定
@@ -36,13 +38,18 @@ class MainWindow():
         for item in self.__configUtil.AlertPoints:
             self.__alertTags.append(
                 AlertTag(self.__canvas, item["number"], item["X"], item["Y"]))
+        # 產生攝影機標籤位置
+        for item in self.__configUtil.cameraPoints:
+            self.__cameraTags.append(
+                CameraTag(self.__canvas, item["number"], item["X"], item["Y"]))
 
         # 給兩個按鈕來測試閃爍
         def click1():
             self.__alertTags[2].TriggerAlert()
+
         def click2():
             self.__alertTags[2].TriggerStop()
-        
+
         button1 = tk.Button(text='啟動', command=click1)
         button1.place(x=10, y=10)
         button2 = tk.Button(text='停止', command=click2)
@@ -68,6 +75,8 @@ class MainWindow():
                     'oriMapHeight': self.__map.mapOriginHeight
                 }
                 for item in self.__alertTags:
+                    item.Relocate(para)
+                for item in self.__cameraTags:
                     item.Relocate(para)
                 # 更新目前視窗寬高
                 self.__curWidth = event.width

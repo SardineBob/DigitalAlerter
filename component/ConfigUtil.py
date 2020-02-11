@@ -8,6 +8,7 @@ class ConfigUtil():
 
     __filePath = 'config.ini'
     AlertPoints = None
+    cameraPoints = None
 
     def __init__(self):
         # 判斷設定檔是否存在
@@ -19,3 +20,5 @@ class ConfigUtil():
         config.read(self.__filePath)
         # 讀取警報器材位置
         self.AlertPoints = json.loads(config["AlertPoint"]["point"])
+        # 讀取攝影機位置
+        self.cameraPoints = json.loads(config["CameraPoint"]["point"])
