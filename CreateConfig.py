@@ -14,6 +14,16 @@ config['AlertPoint'] = {
         {'number': 5, 'X': 125, 'Y': 125}
     ])
 }
+# 產生攝影機位置資料
+config['CameraPoint'] = {
+    'point': json.dumps([
+        {'number': 1, 'X': 125, 'Y': 25},
+        {'number': 2, 'X': 150, 'Y': 50},
+        {'number': 3, 'X': 175, 'Y': 75},
+        {'number': 4, 'X': 200, 'Y': 100},
+        {'number': 5, 'X': 225, 'Y': 125}
+    ])
+}
 
 # 寫入設定檔
 with open('config.ini', 'w') as configFile:
