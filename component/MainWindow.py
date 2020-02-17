@@ -17,6 +17,12 @@ class MainWindow():
     __alertTags = []
     __cameraTags = []
 
+    # 測試用
+    __window = None
+    __window1 = None
+    __window2 = None
+    __window3 = None
+
     def __init__(self):
         # 準備主要視窗設定
         self.__mainWindow = tk.Tk()
@@ -47,11 +53,29 @@ class MainWindow():
 
         def click2():
             self.__alertTags[2].TriggerStop()
+            for item in self.__cameraTags:
+                item.RtspStop()
+
+        # def click3():
+            # self.__window = CameraWindow(
+            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 100, 100)
+            # self.__window1 = CameraWindow(
+            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 100, 270)
+            # self.__window2 = CameraWindow(
+            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 350, 100)
+            # self.__window3 = CameraWindow(
+            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 350, 270)
+            # self.__window.Start()
+            # self.__window1.Start()
+            # self.__window2.Start()
+            # self.__window3.Start()
 
         button1 = tk.Button(text='啟動', command=click1)
         button1.place(x=10, y=10)
         button2 = tk.Button(text='停止', command=click2)
         button2.place(x=50, y=10)
+        #button3 = tk.Button(text='播放', command=click3)
+        #button3.place(x=90, y=10)
 
         # 開啟視窗
         self.__mainWindow.mainloop()
