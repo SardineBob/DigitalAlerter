@@ -3,7 +3,6 @@ from component.ConfigUtil import ConfigUtil
 from component.Map import Map
 from component.AlertTag import AlertTag
 from component.CameraTag import CameraTag
-from component.CameraWindow import CameraWindow
 
 
 class MainWindow():
