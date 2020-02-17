@@ -10,7 +10,11 @@ class AlertTag(Tag):
     __task = None
     __flickerStatus = False  # 控制Tag閃爍的開關
 
-    def __init__(self, canvas, pointid, x=0, y=0):
+    def __init__(self, canvas, configItem):
+        # 取出需用到的設定值
+        pointid = configItem["number"]
+        x = configItem["X"]
+        y = configItem["Y"]
         # open警報點標籤的icon image
         picLoad = Image.open(self.__picPath)
         picPhoto = ImageTk.PhotoImage(picLoad)

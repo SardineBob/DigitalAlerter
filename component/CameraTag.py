@@ -8,7 +8,11 @@ class CameraTag(Tag):
 
     __picPath = './resource/IconCamera.png'
 
-    def __init__(self, canvas, pointid, x=0, y=0):
+    def __init__(self, canvas, configItem):
+        # 取出需用到的設定值
+        pointid = configItem["number"]
+        x = configItem["X"]
+        y = configItem["Y"]
         # open攝影機標籤的icon image
         picLoad = Image.open(self.__picPath)
         picPhoto = ImageTk.PhotoImage(picLoad)

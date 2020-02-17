@@ -36,12 +36,10 @@ class MainWindow():
         self.__map.Draw(self.__originWidth, self.__originHeight)
         # 產生保全器材(警報點)標籤位置
         for item in self.__configUtil.AlertPoints:
-            self.__alertTags.append(
-                AlertTag(self.__canvas, item["number"], item["X"], item["Y"]))
+            self.__alertTags.append(AlertTag(self.__canvas, item))
         # 產生攝影機標籤位置
         for item in self.__configUtil.cameraPoints:
-            self.__cameraTags.append(
-                CameraTag(self.__canvas, item["number"], item["X"], item["Y"]))
+            self.__cameraTags.append(CameraTag(self.__canvas, item))
 
         # 給兩個按鈕來測試閃爍
         def click1():
