@@ -17,11 +17,16 @@ config['AlertPoint'] = {
 # 產生攝影機位置資料
 config['CameraPoint'] = {
     'point': json.dumps([
-        {'number': 1, 'X': 125, 'Y': 25},
-        {'number': 2, 'X': 150, 'Y': 50},
-        {'number': 3, 'X': 175, 'Y': 75},
-        {'number': 4, 'X': 200, 'Y': 100},
-        {'number': 5, 'X': 225, 'Y': 125}
+        {'number': 1, 'X': 125, 'Y': 25,
+            'rtspUrl': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov'},
+        {'number': 2, 'X': 150, 'Y': 50,
+            'rtspUrl': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov'},
+        {'number': 3, 'X': 175, 'Y': 75,
+            'rtspUrl': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov'},
+        {'number': 4, 'X': 200, 'Y': 100,
+            'rtspUrl': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov'},
+        {'number': 5, 'X': 225, 'Y': 125,
+            'rtspUrl': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov'}
     ])
 }
 
