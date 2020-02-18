@@ -15,6 +15,7 @@ class RtspWindow():
     __height = 5
     __task = None
     __active = False
+    __relocatePara = None  # 視窗resize時，所傳入的參數，記錄下來，移動RTSP Window時，需要將座標根據縮放比例重新計算
 
     def __init__(self, para):
         # 取出需用到的設定值
@@ -26,6 +27,8 @@ class RtspWindow():
             bg="black", width=self.__width, height=self.__height)
         # 放置在畫面上
         self.__window.place(x=self.__x, y=self.__y, anchor='nw')
+        # 註冊RTSP視窗拖移事件
+        self.__window.bind('<B1-Motion>', self.__DragEvent)
 
     # 開始播放RTSP影像串流(建立一個執行序來跑，以免畫面Lock)
     def Start(self):
@@ -70,3 +73,15 @@ class RtspWindow():
         newY = result["newY"]
         # 重新定位RTSP Window的位置
         self.__window.place(x=newX, y=newY, anchor='nw')
+        # 紀錄這次的參數
+        self.__relocatePara = para
+
+    def __DragEvent(self, event):
+        print(event.x, event.y)
+        self.__x = event.x
+        self.__y = 100
+        # 若曾經縮放過，則這個新座標要根據比例縮放
+        if self.__relocatePara is None:
+            self.__window.place(x=self.__x, y=self.__y, anchor='nw')
+        else:
+            self.Relocate(self.__relocatePara)
