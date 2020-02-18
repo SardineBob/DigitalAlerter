@@ -1,25 +1,26 @@
 import tkinter as tk
-from component.Tag import Tag
 from PIL import Image, ImageTk
 from cv2 import cv2
-import time
 import threading
+from library.LocationFunc import Relocate
 
 
 class RtspWindow():
 
     __window = None
     __url = None
-    __x = 200
-    __y = 200
+    __x = 0
+    __y = 0
     __width = 10
     __height = 5
     __task = None
     __active = False
 
-    def __init__(self, parameter):
+    def __init__(self, para):
         # 取出需用到的設定值
-        self.__url = parameter["url"]
+        self.__url = para["url"]
+        self.__x = para["x"]
+        self.__y = para["y"]
         # 建立承載RTSP影像串流的容器物件
         self.__window = tk.Label(
             bg="black", width=self.__width, height=self.__height)
@@ -55,3 +56,17 @@ class RtspWindow():
                     image=photo, width=photo.width(), height=photo.height())
                 self.__window.rtspImage = photo
         video.release()
+
+    # 因應視窗縮放，根據縮放比例重新定位視窗位置
+    def Relocate(self, para):
+        if self.__window is None:
+            return
+        # 放置目前的XY座標
+        para["oriX"] = self.__x
+        para["oriY"] = self.__y
+        # 取得因為視窗縮放產生的新座標
+        result = Relocate(para)
+        newX = result["newX"]
+        newY = result["newY"]
+        # 重新定位RTSP Window的位置
+        self.__window.place(x=newX, y=newY, anchor='nw')

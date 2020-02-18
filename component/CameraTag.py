@@ -13,6 +13,8 @@ class CameraTag(Tag):
     __rtspUrl = ''
     __rtspWindow = None
     __rtspOpen = False
+    __rtspX = 0
+    __rtspY = 0
 
     def __init__(self, canvas, configItem):
         # 取出需用到的設定值
@@ -36,7 +38,9 @@ class CameraTag(Tag):
     def __CameraClickEvent(self, event):
         # 判斷是否需建立承載RTSP影像串流的容器物件
         if self.__rtspWindow is None:
-            self.__rtspWindow = RtspWindow({'url': self.__rtspUrl})
+            self.__rtspWindow = RtspWindow(
+                {'url': self.__rtspUrl, 'x': self.__rtspX, 'y': self.__rtspY}
+            )
         # 點擊第一下開啟影像，第二下關閉影像
         if self.__rtspOpen is False:
             self.__rtspOpen = True
@@ -46,5 +50,8 @@ class CameraTag(Tag):
             self.__rtspWindow.Stop()
             self.__rtspWindow = None
 
-        # 兩個問題
-        # 2.視窗放大縮小 重新定位的問題
+    # 這邊因應RTSP Window也要重新定位，所以做了override，除了super的動作跑完，也要跑rtsp window relocate
+    def Relocate(self, para):
+        super().Relocate(para)
+        if self.__rtspWindow is not None:
+            self.__rtspWindow.Relocate(para)

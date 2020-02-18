@@ -1,4 +1,5 @@
 import tkinter as tk
+from library.LocationFunc import Relocate
 
 
 class Tag():
@@ -30,31 +31,16 @@ class Tag():
             x, y, image=picPhoto, anchor=tk.NW, tags=tagName)
 
     def Relocate(self, para):
-        # 取出KV結構內資料待處理
-        curWindowWidth = para['curWindowWidth'] if 'curWindowWidth' in para else 640
-        curWindowHeight = para['curWindowHeight'] if 'curWindowHeight' in para else 480
-        oriWindowWidth = para['oriWindowWidth'] if 'oriWindowWidth' in para else 640
-        oriWindowHeight = para['oriWindowHeight'] if 'oriWindowHeight' in para else 480
-        oriMapWidth = para['oriMapWidth'] if 'oriMapWidth' in para else 640
-        oriMapHeight = para['oriMapHeight'] if 'oriMapHeight' in para else 480
-        # 計算目前視窗寬高與原寬高異動比率(ex.據比例調整保全器材位置)
-        ratioWidth = curWindowWidth / oriWindowWidth if curWindowWidth <= oriMapWidth \
-            else oriMapWidth / oriWindowWidth
-        ratioHeight = curWindowHeight / oriWindowHeight if curWindowHeight <= oriMapHeight \
-            else oriMapHeight / oriWindowHeight
-        # 判斷視窗放大超過原始地圖寬高，則增加空白偏移量(因地圖在視窗置中，故(視窗寬高-地圖寬高) / 2)
-        offsetX = 0 if curWindowWidth <= oriMapWidth \
-            else (curWindowWidth - oriMapWidth) / 2
-        offsetY = 0 if curWindowHeight <= oriMapHeight \
-            else (curWindowHeight - oriMapHeight) / 2
+        # 放置目前的XY座標
+        para["oriX"] = self.tagX
+        para["oriY"] = self.tagY
+        # 取得因為視窗縮放產生的新座標
+        result = Relocate(para)
+        newX = result["newX"]
+        newY = result["newY"]
         # 重新定位tag(包含背景)的位置
-        newX = self.tagX * ratioWidth + offsetX
-        newY = self.tagY * ratioHeight + offsetY
         self.canvas.coords(self.tagid, newX, newY)
-        self.canvas.coords(
-            self.bgid,
-            self.getBGCoords(newX, newY)
-        )
+        self.canvas.coords(self.bgid, self.getBGCoords(newX, newY))
 
     # 計算Tag背景的圓型位置，這邊只是微調一下，讓畫面好看
     def getBGCoords(self, tagX, tagY):
