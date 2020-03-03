@@ -18,12 +18,14 @@ class RtspWindow():
     __relocatePara = None  # 視窗resize時，所傳入的參數，記錄下來，移動RTSP Window時，需要將座標根據縮放比例重新計算
     __preMoveCoordX = 0  # 紀錄RTSP視窗拖移時，前一次的XY座標(計算拖移量用)
     __preMoveCoordY = 0
+    __closeMethod = None  # RTSP是窗關閉的方法，包含tag的開關狀態控制異動
 
     def __init__(self, para):
         # 取出需用到的設定值
         self.__url = para["url"]
         self.__coordX = para["x"]
         self.__coordY = para["y"]
+        self.__closeMethod = para["closeMethod"]
         # 建立承載RTSP影像串流的容器物件
         self.__window = tk.Label(
             bg="black", width=self.__width, height=self.__height)
@@ -34,6 +36,8 @@ class RtspWindow():
         self.__window.bind('<Button-1>', self.__ClickEvent)
         # 註冊RTSP視窗拖移事件
         self.__window.bind('<B1-Motion>', self.__DragEvent)
+        # 註冊RTSP視窗雙擊事件(關閉視窗)
+        self.__window.bind('<Double-Button-1>', self.__DoubleClickEvent)
 
     # 開始播放RTSP影像串流(建立一個執行序來跑，以免畫面Lock)
     def Start(self):
@@ -102,3 +106,7 @@ class RtspWindow():
             self.__window.place(x=newX, y=newY, anchor='nw')
         else:
             self.Relocate(self.__relocatePara)
+
+    # RTSP視窗雙擊事件
+    def __DoubleClickEvent(self, event):
+        self.__closeMethod()
