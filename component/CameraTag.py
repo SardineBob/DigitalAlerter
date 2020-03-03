@@ -39,19 +39,26 @@ class CameraTag(Tag):
         # 判斷是否需建立承載RTSP影像串流的容器物件
         if self.__rtspWindow is None:
             self.__rtspWindow = RtspWindow(
-                {'url': self.__rtspUrl, 'x': self.__rtspX, 'y': self.__rtspY}
+                {'url': self.__rtspUrl,
+                 'x': self.__rtspX,
+                 'y': self.__rtspY,
+                 'closeMethod': self.__RtspClose}
             )
         # 點擊第一下開啟影像，第二下關閉影像
         if self.__rtspOpen is False:
             self.__rtspOpen = True
             self.__rtspWindow.Start()
         else:
-            self.__rtspOpen = False
-            self.__rtspWindow.Stop()
-            self.__rtspWindow = None
+            self.__RtspClose()
 
     # 這邊因應RTSP Window也要重新定位，所以做了override，除了super的動作跑完，也要跑rtsp window relocate
     def Relocate(self, para):
         super().Relocate(para)
         if self.__rtspWindow is not None:
             self.__rtspWindow.Relocate(para)
+
+    # RTSP Window關閉的方法，抽出來，也要傳進去RTSP Window本身，使用者點兩下也可以關閉
+    def __RtspClose(self):
+        self.__rtspOpen = False
+        self.__rtspWindow.Stop()
+        self.__rtspWindow = None
