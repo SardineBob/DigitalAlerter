@@ -3,6 +3,7 @@ from PIL import Image, ImageTk
 from cv2 import cv2
 import threading
 from library.LocationFunc import Relocate
+from component.RtspLinkLine import RtspLinkLine
 
 
 class RtspWindow():
@@ -18,7 +19,11 @@ class RtspWindow():
     __relocatePara = None  # 視窗resize時，所傳入的參數，記錄下來，移動RTSP Window時，需要將座標根據縮放比例重新計算
     __preMoveCoordX = 0  # 紀錄RTSP視窗拖移時，前一次的XY座標(計算拖移量用)
     __preMoveCoordY = 0
-    __closeMethod = None  # RTSP是窗關閉的方法，包含tag的開關狀態控制異動
+    __closeMethod = None  # RTSP視窗關閉的方法，包含tag的開關狀態控制異動
+    __canvas = None  # 繪製連接線的畫布物件
+    __tagX = None  # tag的座標位置，繪製連接線使用
+    __tagY = None
+    __linkLine = None  # Tag與RTSP視窗的連接線
 
     def __init__(self, para):
         # 取出需用到的設定值
@@ -26,6 +31,9 @@ class RtspWindow():
         self.__coordX = para["x"]
         self.__coordY = para["y"]
         self.__closeMethod = para["closeMethod"]
+        self.__canvas = para["canvas"]
+        self.__tagX = para["tagX"]
+        self.__tagY = para["tagY"]
         # 建立承載RTSP影像串流的容器物件
         self.__window = tk.Label(
             bg="black", width=self.__width, height=self.__height)
@@ -38,6 +46,10 @@ class RtspWindow():
         self.__window.bind('<B1-Motion>', self.__DragEvent)
         # 註冊RTSP視窗雙擊事件(關閉視窗)
         self.__window.bind('<Double-Button-1>', self.__DoubleClickEvent)
+        # 產生一條連接線物件
+        self.__linkLine = RtspLinkLine(self.__canvas)
+        self.__linkLine.DrawLinkLine(
+            self.__tagX, self.__tagY, self.__coordX, self.__coordY)
 
     # 開始播放RTSP影像串流(建立一個執行序來跑，以免畫面Lock)
     def Start(self):
@@ -53,6 +65,8 @@ class RtspWindow():
         self.__task = None  # 停止，執行序清掉(等待python程序GC)，以利下一次觸發
         self.__window.destroy()  # 銷毀
         self.__window = None
+        self.__linkLine.DropLinkLine()  # 移除連接線
+        self.__linkLine = None
 
     # 執行RTSP影像串流播放的動作
     def __Play(self):
@@ -106,6 +120,8 @@ class RtspWindow():
             self.__window.place(x=newX, y=newY, anchor='nw')
         else:
             self.Relocate(self.__relocatePara)
+        # 根據拖移新座標，移動連接線
+        self.__linkLine.MoveLinkLine(newX, newY)
 
     # RTSP視窗雙擊事件
     def __DoubleClickEvent(self, event):
