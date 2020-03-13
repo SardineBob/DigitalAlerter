@@ -42,7 +42,10 @@ class CameraTag(Tag):
                 {'url': self.__rtspUrl,
                  'x': self.__rtspX,
                  'y': self.__rtspY,
-                 'closeMethod': self.__RtspClose}
+                 'closeMethod': self.__RtspClose,
+                 'canvas': self.canvas,
+                 'tagX': self.tagX + (self.tagW / 2),
+                 'tagY': self.tagY + (self.tagH / 2)}
             )
         # 點擊第一下開啟影像，第二下關閉影像
         if self.__rtspOpen is False:
