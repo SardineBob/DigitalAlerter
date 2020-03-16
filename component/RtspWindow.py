@@ -2,7 +2,6 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from cv2 import cv2
 import threading
-from library.LocationFunc import Relocate
 from component.RtspLinkLine import RtspLinkLine
 
 
@@ -16,11 +15,12 @@ class RtspWindow():
     __height = 5
     __task = None
     __active = False
-    __relocatePara = None  # 視窗resize時，所傳入的參數，記錄下來，移動RTSP Window時，需要將座標根據縮放比例重新計算
+    # __relocatePara = None  # 視窗resize時，所傳入的參數，記錄下來，移動RTSP Window時，需要將座標根據縮放比例重新計算
     __preMoveCoordX = 0  # 紀錄RTSP視窗拖移時，前一次的XY座標(計算拖移量用)
     __preMoveCoordY = 0
     __closeMethod = None  # RTSP視窗關閉的方法，包含tag的開關狀態控制異動
     __canvas = None  # 繪製連接線的畫布物件
+    __relocate = None  # 視窗異動而座標重新定位的物件
     __tagX = None  # tag的座標位置，繪製連接線使用
     __tagY = None
     __linkLine = None  # Tag與RTSP視窗的連接線
@@ -32,8 +32,9 @@ class RtspWindow():
         self.__coordY = para["y"]
         self.__closeMethod = para["closeMethod"]
         self.__canvas = para["canvas"]
-        self.__tagX = para["tagX"]
-        self.__tagY = para["tagY"]
+        self.__relocate = para["relocate"]
+        self.__tagX = para["cameraTagX"]
+        self.__tagY = para["cameraTagY"]
         # 建立承載RTSP影像串流的容器物件
         self.__window = tk.Label(
             bg="black", width=self.__width, height=self.__height)
@@ -84,20 +85,18 @@ class RtspWindow():
         video.release()
 
     # 因應視窗縮放，根據縮放比例重新定位視窗位置
-    def Relocate(self, para):
+    def Relocate(self):
         if self.__window is None:
             return
-        # 放置目前的XY座標
-        para["oriX"] = self.__coordX
-        para["oriY"] = self.__coordY
         # 取得因為視窗縮放產生的新座標
-        result = Relocate(para)
+        result = self.__relocate.Relocate(self.__coordX, self.__coordY)
         newX = result["newX"]
         newY = result["newY"]
         # 重新定位RTSP Window的位置
         self.__window.place(x=newX, y=newY, anchor='nw')
-        # 紀錄這次的參數
-        self.__relocatePara = para
+        # 同步relocate連接線的位置
+        self.__linkLine.Relocate(
+            self.__tagX, self.__tagY, newX, newY)
 
     # RTSP視窗點擊事件
     def __ClickEvent(self, event):
@@ -115,14 +114,14 @@ class RtspWindow():
         # 更新RTSP視窗目前座標
         self.__coordX = newX
         self.__coordY = newY
-        # 若曾經縮放過，則這個新座標要根據比例縮放
-        if self.__relocatePara is None:
-            self.__window.place(x=newX, y=newY, anchor='nw')
-        else:
-            self.Relocate(self.__relocatePara)
-        # 根據拖移新座標，移動連接線
-        self.__linkLine.MoveLinkLine(newX, newY)
+        # 重新定位要移動的新座標
+        self.Relocate()
 
     # RTSP視窗雙擊事件
     def __DoubleClickEvent(self, event):
         self.__closeMethod()
+
+    # 設定與該RTSP Window對應的Camera Tag座標位置
+    def SetCameraTagCoords(self, X, Y):
+        self.__tagX = X
+        self.__tagY = Y
