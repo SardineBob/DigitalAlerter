@@ -4,6 +4,7 @@ from component.Map import Map
 from component.WindowRelocate import WindowRelocate
 from component.AlertTag import AlertTag
 from component.CameraTag import CameraTag
+from component.RaspberryPiSignal import RaspberryPiSignal
 
 
 class MainWindow():
@@ -63,9 +64,13 @@ class MainWindow():
             self.__alertTags[2].TriggerAlert()
 
         def click2():
-            self.__alertTags[2].TriggerStop()
-            for item in self.__cameraTags:
-                item.RtspStop()
+            #self.__alertTags[2].TriggerStop()
+            #for item in self.__cameraTags:
+            #    item.RtspStop()
+            self.__test.closeTask()
+
+        def click3():
+            self.__test = RaspberryPiSignal()
 
         # def click3():
             # self.__window = CameraWindow(
@@ -85,6 +90,8 @@ class MainWindow():
         button1.place(x=10, y=10)
         button2 = tk.Button(text='停止', command=click2)
         button2.place(x=50, y=10)
+        button3 = tk.Button(text='連線', command=click3)
+        button3.place(x=90, y=10)
         #button3 = tk.Button(text='播放', command=click3)
         #button3.place(x=90, y=10)
 
