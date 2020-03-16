@@ -10,7 +10,7 @@ class AlertTag(Tag):
     __task = None
     __flickerStatus = False  # 控制Tag閃爍的開關
 
-    def __init__(self, canvas, configItem):
+    def __init__(self, canvas, relocate, configItem):
         # 取出需用到的設定值
         pointid = configItem["number"]
         x = configItem["X"]
@@ -23,7 +23,7 @@ class AlertTag(Tag):
             canvas.alertIcon = []
         canvas.alertIcon.append(picPhoto)
         # 傳入父類別，建立警報點標籤物件
-        super().__init__(canvas, pointid, x, y, picPhoto, 'alert')
+        super().__init__(canvas, relocate, pointid, x, y, picPhoto, 'alert')
 
     # 標籤觸發警報動作，閃爍背景(紅色)來達到視覺注目效果(使用執行序來跑，以免畫面lock)
     def TriggerAlert(self):

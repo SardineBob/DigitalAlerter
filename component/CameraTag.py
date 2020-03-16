@@ -16,7 +16,7 @@ class CameraTag(Tag):
     __rtspX = 0
     __rtspY = 0
 
-    def __init__(self, canvas, configItem):
+    def __init__(self, canvas, relocate, configItem):
         # 取出需用到的設定值
         pointid = configItem["number"]
         x = configItem["X"]
@@ -30,7 +30,7 @@ class CameraTag(Tag):
             canvas.cameraIcon = []
         canvas.cameraIcon.append(picPhoto)
         # 傳入父類別，建立攝影機標籤物件
-        super().__init__(canvas, pointid, x, y, picPhoto, 'camera')
+        super().__init__(canvas, relocate, pointid, x, y, picPhoto, 'camera')
         # 綁定Click事件到全部擁有camera這個tags的物件
         canvas.tag_bind(self.tagid, '<Button-1>', self.__CameraClickEvent)
 
@@ -44,8 +44,9 @@ class CameraTag(Tag):
                  'y': self.__rtspY,
                  'closeMethod': self.__RtspClose,
                  'canvas': self.canvas,
-                 'tagX': self.tagX + (self.tagW / 2),
-                 'tagY': self.tagY + (self.tagH / 2)}
+                 'relocate': self.relocate,
+                 'cameraTagX': self.tagX + (self.tagW / 2),
+                 'cameraTagY': self.tagY + (self.tagH / 2)}
             )
         # 點擊第一下開啟影像，第二下關閉影像
         if self.__rtspOpen is False:
@@ -55,10 +56,13 @@ class CameraTag(Tag):
             self.__RtspClose()
 
     # 這邊因應RTSP Window也要重新定位，所以做了override，除了super的動作跑完，也要跑rtsp window relocate
-    def Relocate(self, para):
-        super().Relocate(para)
+    def Relocate(self):
+        super().Relocate()
         if self.__rtspWindow is not None:
-            self.__rtspWindow.Relocate(para)
+            # 將目前camera tag座標放進去，讓linkline更新位置
+            self.__rtspWindow.SetCameraTagCoords(
+                self.tagX + (self.tagW / 2), self.tagY + (self.tagH / 2))
+            self.__rtspWindow.Relocate()
 
     # RTSP Window關閉的方法，抽出來，也要傳進去RTSP Window本身，使用者點兩下也可以關閉
     def __RtspClose(self):

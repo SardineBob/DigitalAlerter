@@ -1,23 +1,26 @@
 import tkinter as tk
-from library.LocationFunc import Relocate
 
 
 class Tag():
 
     canvas = None
+    relocate = None
     tagid = None
     bgid = None
     pointid = None
-    tagX = 0
+    tagX = 0  # 目前tag的座標位置
     tagY = 0
     tagW = 0
     tagH = 0
+    oriTagX = 0  # 初始化時tag的座標位置，作為計算視窗縮放後新座標基準
+    oriTagY = 0
 
-    def __init__(self, canvas, pointid, x, y, picPhoto, tagName):
+    def __init__(self, canvas, relocate, pointid, x, y, picPhoto, tagName):
         self.canvas = canvas
+        self.relocate = relocate
         self.pointid = pointid
-        self.tagX = x
-        self.tagY = y
+        self.tagX = self.oriTagX = x
+        self.tagY = self.oriTagY = y
         self.tagW = picPhoto.width()
         self.tagH = picPhoto.height()
         # 先繪製Tag背景圓型，並預設為綠色(警報時為紅色)(__getBGCoords=>計算微調背景圓型在tag的位置)
@@ -30,17 +33,14 @@ class Tag():
         self.tagid = canvas.create_image(
             x, y, image=picPhoto, anchor=tk.NW, tags=tagName)
 
-    def Relocate(self, para):
-        # 放置目前的XY座標
-        para["oriX"] = self.tagX
-        para["oriY"] = self.tagY
+    def Relocate(self):
         # 取得因為視窗縮放產生的新座標
-        result = Relocate(para)
-        newX = result["newX"]
-        newY = result["newY"]
+        result = self.relocate.Relocate(self.oriTagX, self.oriTagY)
+        self.tagX = result["newX"]
+        self.tagY = result["newY"]
         # 重新定位tag(包含背景)的位置
-        self.canvas.coords(self.tagid, newX, newY)
-        self.canvas.coords(self.bgid, self.getBGCoords(newX, newY))
+        self.canvas.coords(self.tagid, self.tagX, self.tagY)
+        self.canvas.coords(self.bgid, self.getBGCoords(self.tagX, self.tagY))
 
     # 計算Tag背景的圓型位置，這邊只是微調一下，讓畫面好看
     def getBGCoords(self, tagX, tagY):

@@ -1,6 +1,7 @@
 import tkinter as tk
 from component.ConfigUtil import ConfigUtil
 from component.Map import Map
+from component.WindowRelocate import WindowRelocate
 from component.AlertTag import AlertTag
 from component.CameraTag import CameraTag
 
@@ -14,6 +15,7 @@ class MainWindow():
     __mainWindow = None
     __canvas = None
     __map = None
+    __windowRelocate = None
     __alertTags = []
     __cameraTags = []
 
@@ -40,12 +42,21 @@ class MainWindow():
         # 產生地圖物件
         self.__map = Map(self.__canvas)
         self.__map.Draw(self.__originWidth, self.__originHeight)
+        # 產生視窗重新定位的物件
+        self.__windowRelocate = WindowRelocate({
+            'oriWindowWidth': self.__originWidth,
+            'oriWindowHeight': self.__originHeight,
+            'oriMapWidth': self.__map.mapOriginWidth,
+            'oriMapHeight': self.__map.mapOriginHeight
+        })
         # 產生保全器材(警報點)標籤位置
         for item in self.__configUtil.AlertPoints:
-            self.__alertTags.append(AlertTag(self.__canvas, item))
+            self.__alertTags.append(
+                AlertTag(self.__canvas, self.__windowRelocate, item))
         # 產生攝影機標籤位置
         for item in self.__configUtil.cameraPoints:
-            self.__cameraTags.append(CameraTag(self.__canvas, item))
+            self.__cameraTags.append(
+                CameraTag(self.__canvas, self.__windowRelocate, item))
 
         # 給兩個按鈕來測試閃爍
         def click1():
@@ -87,19 +98,13 @@ class MainWindow():
             if self.__curWidth != event.width or self.__curHeight != event.height:
                 # 觸發執行Map Resize動作
                 self.__map.Draw(event.width, event.height)
+                # 設定目前Window Resize後的寬高大小
+                self.__windowRelocate.SetCurrentSize(event.width, event.height)
                 # 重新定位保全器材標籤位置
-                para = {
-                    'curWindowWidth': event.width,
-                    'curWindowHeight': event.height,
-                    'oriWindowWidth': self.__originWidth,
-                    'oriWindowHeight': self.__originHeight,
-                    'oriMapWidth': self.__map.mapOriginWidth,
-                    'oriMapHeight': self.__map.mapOriginHeight
-                }
                 for item in self.__alertTags:
-                    item.Relocate(para)
+                    item.Relocate()
                 for item in self.__cameraTags:
-                    item.Relocate(para)
+                    item.Relocate()
                 # 更新目前視窗寬高
                 self.__curWidth = event.width
                 self.__curHeight = event.height
