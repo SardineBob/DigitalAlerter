@@ -1,1 +1,2 @@
-this is DigitalAlerter
+# 安裝websocket-client
+## pip install websocket-client

@@ -36,24 +36,7 @@ class CameraTag(Tag):
 
     # 點擊攝影機Tag的事件，會開啟該攝影機的RTSP影像串流
     def __CameraClickEvent(self, event):
-        # 判斷是否需建立承載RTSP影像串流的容器物件
-        if self.__rtspWindow is None:
-            self.__rtspWindow = RtspWindow(
-                {'url': self.__rtspUrl,
-                 'x': self.__rtspX,
-                 'y': self.__rtspY,
-                 'closeMethod': self.__RtspClose,
-                 'canvas': self.canvas,
-                 'relocate': self.relocate,
-                 'cameraTagX': self.tagX + (self.tagW / 2),
-                 'cameraTagY': self.tagY + (self.tagH / 2)}
-            )
-        # 點擊第一下開啟影像，第二下關閉影像
-        if self.__rtspOpen is False:
-            self.__rtspOpen = True
-            self.__rtspWindow.Start()
-        else:
-            self.__RtspClose()
+        self.openRtsp()
 
     # 這邊因應RTSP Window也要重新定位，所以做了override，除了super的動作跑完，也要跑rtsp window relocate
     def Relocate(self):
@@ -64,8 +47,30 @@ class CameraTag(Tag):
                 self.tagX + (self.tagW / 2), self.tagY + (self.tagH / 2))
             self.__rtspWindow.Relocate()
 
+    # RTSP Window開啟的方法，也要提供保全器材來觸發開啟
+    def openRtsp(self):
+        # 判斷是否需建立承載RTSP影像串流的容器物件
+        if self.__rtspWindow is None:
+            self.__rtspWindow = RtspWindow(
+                {'url': self.__rtspUrl,
+                 'x': self.__rtspX,
+                 'y': self.__rtspY,
+                 'closeMethod': self.closeRtsp,
+                 'canvas': self.canvas,
+                 'relocate': self.relocate,
+                 'cameraTagX': self.tagX + (self.tagW / 2),
+                 'cameraTagY': self.tagY + (self.tagH / 2)}
+            )
+        # 點擊第一下開啟影像，第二下關閉影像
+        if self.__rtspOpen is False:
+            self.__rtspOpen = True
+            self.__rtspWindow.Start()
+        else:
+            self.closeRtsp()
+
     # RTSP Window關閉的方法，抽出來，也要傳進去RTSP Window本身，使用者點兩下也可以關閉
-    def __RtspClose(self):
+    def closeRtsp(self):
         self.__rtspOpen = False
-        self.__rtspWindow.Stop()
+        if self.__rtspWindow is not None:
+            self.__rtspWindow.Stop()
         self.__rtspWindow = None

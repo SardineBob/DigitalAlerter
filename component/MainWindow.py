@@ -4,6 +4,7 @@ from component.Map import Map
 from component.WindowRelocate import WindowRelocate
 from component.AlertTag import AlertTag
 from component.CameraTag import CameraTag
+from component.RaspberryPiSignal import RaspberryPiSignal
 
 
 class MainWindow():
@@ -57,15 +58,24 @@ class MainWindow():
         for item in self.__configUtil.cameraPoints:
             self.__cameraTags.append(
                 CameraTag(self.__canvas, self.__windowRelocate, item))
+        # 建立保全器材(警報點)與攝影機的連結關係
+        for item in self.__alertTags:
+            item.linkCamera(self.__cameraTags)
 
         # 給兩個按鈕來測試閃爍
         def click1():
             self.__alertTags[2].TriggerAlert()
 
         def click2():
-            self.__alertTags[2].TriggerStop()
-            for item in self.__cameraTags:
-                item.RtspStop()
+            for tag in self.__alertTags:
+                tag.TriggerStop()
+            # self.__alertTags[2].TriggerStop()
+            # for item in self.__cameraTags:
+            #    item.RtspStop()
+            self.__test.closeTask()
+
+        def click3():
+            self.__test = RaspberryPiSignal(self.__alertTags)
 
         # def click3():
             # self.__window = CameraWindow(
@@ -85,6 +95,8 @@ class MainWindow():
         button1.place(x=10, y=10)
         button2 = tk.Button(text='停止', command=click2)
         button2.place(x=50, y=10)
+        button3 = tk.Button(text='連線', command=click3)
+        button3.place(x=90, y=10)
         #button3 = tk.Button(text='播放', command=click3)
         #button3.place(x=90, y=10)
 
