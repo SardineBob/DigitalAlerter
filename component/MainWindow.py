@@ -64,13 +64,15 @@ class MainWindow():
             self.__alertTags[2].TriggerAlert()
 
         def click2():
-            #self.__alertTags[2].TriggerStop()
-            #for item in self.__cameraTags:
+            for tag in self.__alertTags:
+                tag.TriggerStop()
+            # self.__alertTags[2].TriggerStop()
+            # for item in self.__cameraTags:
             #    item.RtspStop()
             self.__test.closeTask()
 
         def click3():
-            self.__test = RaspberryPiSignal()
+            self.__test = RaspberryPiSignal(self.__alertTags)
 
         # def click3():
             # self.__window = CameraWindow(

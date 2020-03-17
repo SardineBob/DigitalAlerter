@@ -7,9 +7,11 @@ class RaspberryPiSignal:
     __wsUrl = "ws://localhost:9453"
     __ws = None
     __task = None
+    __alertTagCollection = None
 
-    def __init__(self):
+    def __init__(self, alertTagCollection):
         # enableTrace(True)  # 啟動偵錯模式
+        self.__alertTagCollection = alertTagCollection
         self.__createTask()
 
     # 將接收websocket訊號的方法，使用執行序背景執行
@@ -24,6 +26,7 @@ class RaspberryPiSignal:
         self.__ws.close()
         self.__ws = None
         self.__task = None
+        self.__alertTagCollection = None
 
     # 產生WebSocket連線
     def __createWebsocket(self):
@@ -39,7 +42,11 @@ class RaspberryPiSignal:
         self.__ws.run_forever()
 
     def __onMessage(self, message):
-        print(message)
+        if self.__alertTagCollection is None:
+            return
+        # 根據收到的Websocket哪一個Alert設備，去執行這一個AlertTag觸發警報事件
+        self.__alertTagCollection[int(message)].TriggerAlert()
+        print("收到的Alert Tag號碼" + message)
 
     def __onError(self, error):
         print("###WebSocket-Error###")
