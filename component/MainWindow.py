@@ -58,6 +58,9 @@ class MainWindow():
         for item in self.__configUtil.cameraPoints:
             self.__cameraTags.append(
                 CameraTag(self.__canvas, self.__windowRelocate, item))
+        # 建立保全器材(警報點)與攝影機的連結關係
+        for item in self.__alertTags:
+            item.linkCamera(self.__cameraTags)
 
         # 給兩個按鈕來測試閃爍
         def click1():

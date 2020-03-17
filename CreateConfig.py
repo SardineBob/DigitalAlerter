@@ -7,11 +7,11 @@ config = configparser.ConfigParser()
 # 產生警報點位置資料
 config['AlertPoint'] = {
     'point': json.dumps([
-        {'number': 1, 'X': 25, 'Y': 25},
-        {'number': 2, 'X': 50, 'Y': 50},
-        {'number': 3, 'X': 75, 'Y': 75},
-        {'number': 4, 'X': 100, 'Y': 100},
-        {'number': 5, 'X': 125, 'Y': 125}
+        {'number': 1, 'X': 25, 'Y': 25, 'cameraLink': [2, 4]},
+        {'number': 2, 'X': 50, 'Y': 50, 'cameraLink': [1, 5]},
+        {'number': 3, 'X': 75, 'Y': 75, 'cameraLink': [3]},
+        {'number': 4, 'X': 100, 'Y': 100, 'cameraLink': [1, 3]},
+        {'number': 5, 'X': 125, 'Y': 125, 'cameraLink': [2, 3, 5]}
     ])
 }
 # 產生攝影機位置資料
