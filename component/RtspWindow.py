@@ -2,6 +2,7 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from cv2 import cv2
 import threading
+import time
 from component.RtspLinkLine import RtspLinkLine
 
 
@@ -21,6 +22,7 @@ class RtspWindow():
     __closeMethod = None  # RTSP視窗關閉的方法，包含tag的開關狀態控制異動
     __canvas = None  # 繪製連接線的畫布物件
     __relocate = None  # 視窗異動而座標重新定位的物件
+    __tagID = None  # Camera Tag ID Number
     __tagX = None  # tag的座標位置，繪製連接線使用
     __tagY = None
     __linkLine = None  # Tag與RTSP視窗的連接線
@@ -33,6 +35,7 @@ class RtspWindow():
         self.__closeMethod = para["closeMethod"]
         self.__canvas = para["canvas"]
         self.__relocate = para["relocate"]
+        self.__tagID = para["cameraTagID"]
         self.__tagX = para["cameraTagX"]
         self.__tagY = para["cameraTagY"]
         # 建立承載RTSP影像串流的容器物件
@@ -71,10 +74,24 @@ class RtspWindow():
 
     # 執行RTSP影像串流播放的動作
     def __Play(self):
+        # 連接RTSP串流
         video = cv2.VideoCapture(self.__url)
+        # 準備錄影的相關參數
+        nowTime = time.strftime('%Y%m%d%H%M%S', time.localtime())
+        recordFile = "CameraRecord/Camera" + \
+            str(self.__tagID) + "-" + nowTime + ".avi"
+        recordForucc = cv2.VideoWriter_fourcc(*self.getSourceFourcc(video))
+        recordFPS = int(video.get(cv2.CAP_PROP_FPS))
+        recordWidth = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+        recordHeight = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        # 建立錄影實體物件
+        record = cv2.VideoWriter(
+            recordFile, recordForucc, recordFPS, (recordWidth, recordHeight))
+        # 讀取RTSP串流，並撥放與錄影
         (status, frame) = video.read()
         while self.__active and status:
             (status, frame) = video.read()
+            record.write(frame)  # 錄製影片到檔案
             imgArray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
             image = Image.fromarray(imgArray)
             photo = ImageTk.PhotoImage(image=image)
@@ -83,6 +100,7 @@ class RtspWindow():
                     image=photo, width=photo.width(), height=photo.height())
                 self.__window.rtspImage = photo
         video.release()
+        record.release()
 
     # 因應視窗縮放，根據縮放比例重新定位視窗位置
     def Relocate(self):
@@ -125,3 +143,9 @@ class RtspWindow():
     def SetCameraTagCoords(self, X, Y):
         self.__tagX = X
         self.__tagY = Y
+
+    # 取得來源RTSP影像的編碼
+    def getSourceFourcc(self, sourceVideo):
+        code = sourceVideo.get(cv2.CAP_PROP_FOURCC)
+        code = "".join([chr((int(code) >> 8 * i) & 0xFF) for i in range(4)])
+        return code

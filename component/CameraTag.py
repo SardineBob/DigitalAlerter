@@ -58,6 +58,7 @@ class CameraTag(Tag):
                  'closeMethod': self.closeRtsp,
                  'canvas': self.canvas,
                  'relocate': self.relocate,
+                 'cameraTagID': self.pointid,
                  'cameraTagX': self.tagX + (self.tagW / 2),
                  'cameraTagY': self.tagY + (self.tagH / 2)}
             )
