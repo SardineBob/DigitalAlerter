@@ -1,5 +1,5 @@
 import tkinter as tk
-from component.ConfigUtil import ConfigUtil
+from utilset.ConfigUtil import ConfigUtil
 from component.Map import Map
 from component.WindowRelocate import WindowRelocate
 from component.AlertTag import AlertTag

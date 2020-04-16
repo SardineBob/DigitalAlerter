@@ -2,6 +2,8 @@ from component.Tag import Tag
 from PIL import Image, ImageTk
 import time
 import threading
+from datetime import datetime
+from utilset.AbnormalUtil import AbnormalUtil
 
 
 class AlertTag(Tag):
@@ -39,6 +41,9 @@ class AlertTag(Tag):
             # 觸發啟動攝影機動作
             for camera in self.__cameraMappingTag:
                 camera.openRtsp()
+            # 警示觸發時，記錄一筆異常紀錄
+            triggerTime = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
+            AbnormalUtil().InsertAbnormalRecord(triggerTime, self.tagid)
 
     # 停止警報觸發動作，停止背景閃爍
     def TriggerStop(self):
