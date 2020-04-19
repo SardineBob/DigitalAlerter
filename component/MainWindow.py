@@ -1,10 +1,12 @@
 import tkinter as tk
+from tkinter import ttk, messagebox
 from utilset.ConfigUtil import ConfigUtil
 from component.Map import Map
 from component.WindowRelocate import WindowRelocate
 from component.AlertTag import AlertTag
 from component.CameraTag import CameraTag
 from component.RaspberryPiSignal import RaspberryPiSignal
+from component.AbnormalWindow import AbnormalWindow
 
 
 class MainWindow():
@@ -19,6 +21,7 @@ class MainWindow():
     __windowRelocate = None
     __alertTags = []
     __cameraTags = []
+    __AbnormalWindow = None
 
     # 測試用
     __window = None
@@ -77,19 +80,47 @@ class MainWindow():
         def click3():
             self.__test = RaspberryPiSignal(self.__alertTags)
 
+        def click4():
+            if self.__AbnormalWindow is None:
+                self.__AbnormalWindow = AbnormalWindow({
+                    "closeMethod": click5
+                })
+            # 自訂一個dialog box
+            #test = tk.Tk()
+            #test.master = self.__mainWindow
+            # test.mainloop()
+            # messagebox.showinfo('555')
+            #test = tk.Frame(self.__mainWindow)
+            # tk.Label(test,text="testestse").pack()
+            #test.place(x=150, y=10)
+            # test.pack()
+            #self.newfream = tk.Toplevel()
+            # self.newfream.resizable(0,0)
+            # self.newfream.attributes('-toolwindow',True)
+            # self.newfream.wm_attributes('-topmost',True)
+            # self.newfream.wm_overrideredirect(True)
+            # self.newfream.geometry("640x480+50+50")
+
+        def click5():
+            if self.__AbnormalWindow is not None:
+                self.__AbnormalWindow.WindowClose()
+                self.__AbnormalWindow = None
+
+            # test.mainloop()
+
         # def click3():
-            # self.__window = CameraWindow(
-            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 100, 100)
-            # self.__window1 = CameraWindow(
-            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 100, 270)
-            # self.__window2 = CameraWindow(
-            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 350, 100)
-            # self.__window3 = CameraWindow(
-            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 350, 270)
-            # self.__window.Start()
-            # self.__window1.Start()
-            # self.__window2.Start()
-            # self.__window3.Start()
+        # self.__window = CameraWindow(
+        #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 100, 100)
+        # self.__window1 = CameraWindow(
+        #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 100, 270)
+        # self.__window2 = CameraWindow(
+        #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 350, 100)
+        # self.__window3 = CameraWindow(
+        #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 350, 270)
+        # self.__window.Start()
+        # self.__window1.Start()
+        # self.__window2.Start()
+        # self.__window3.Start()
 
         button1 = tk.Button(text='啟動', command=click1)
         button1.place(x=10, y=10)
@@ -97,8 +128,22 @@ class MainWindow():
         button2.place(x=50, y=10)
         button3 = tk.Button(text='連線', command=click3)
         button3.place(x=90, y=10)
+        button4 = tk.Button(text='開啟報表', command=click4)
+        button4.place(x=130, y=10)
+        button5 = tk.Button(text='關閉報表', command=click5)
+        button5.place(x=200, y=10)
         #button3 = tk.Button(text='播放', command=click3)
         #button3.place(x=90, y=10)
+
+        # 測試表格
+        #treeview = ttk.Treeview()
+        # treeview["columns"]=("colume1","colume2","colume3")
+#
+        # treeview.heading("#0",text="OK", anchor=tk.W)
+        # treeview.heading("colume1",text="OK")
+        # treeview.heading("colume2",text="OK1")
+        # treeview.heading("colume3",text="OK3")
+        #treeview.place(x=300, y=300)
 
         # 開啟視窗
         self.__mainWindow.mainloop()

@@ -21,9 +21,9 @@ class AbnormalUtil:
         # 開始根據條件搜尋
         if TriggerTime is not None:
             command += " AND TriggerTime=:trigeertime "
-            parameter.trigeertime = TriggerTime
+            parameter["trigeertime"] = TriggerTime
         if TagID is not None:
             command += " AND TagID=:tagid "
-            parameter.tagid = TagID
+            parameter["tagid"] = TagID
 
-        SqlLiteUtil().Execute(command, parameter)
+        return SqlLiteUtil().Execute(command, parameter)
