@@ -38,12 +38,28 @@ class AlertTag(Tag):
             self.__task.setDaemon(True)  # 設定保護執行序，會隨著主視窗關閉，執行序會跟著kill
             self.__flickerStatus = True  # 開啟背景閃爍
             self.__task.start()
+            # 產生觸發時間與錄影檔名
+            nowTime = datetime.now()
+            cameraInfo = []
             # 觸發啟動攝影機動作
             for camera in self.__cameraMappingTag:
+                filename = nowTime.strftime('%Y%m%d%H%M%S') + \
+                    "-Alert" + str(self.pointid) + \
+                    "-Camera" + str(camera.pointid) + ".avi"
+                camera.SetRecordFileName(filename)
                 camera.openRtsp()
+                # 蒐集錄影檔名，準備寫入DB
+                cameraInfo.append({
+                    'cameraID': camera.pointid,
+                    'recordFileName': filename
+                })
             # 警示觸發時，記錄一筆異常紀錄
-            triggerTime = datetime.now().strftime('%Y/%m/%d %H:%M:%S')
-            AbnormalUtil().InsertAbnormalRecord(triggerTime, self.tagid)
+            triggerTime = nowTime.strftime('%Y/%m/%d %H:%M:%S')
+            AbnormalUtil().InsertAbnormalRecord({
+                'triggerTime': triggerTime,
+                'alertID': self.pointid,
+                'cameraInfo': cameraInfo
+            })
 
     # 停止警報觸發動作，停止背景閃爍
     def TriggerStop(self):

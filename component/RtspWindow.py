@@ -26,6 +26,7 @@ class RtspWindow():
     __tagX = None  # tag的座標位置，繪製連接線使用
     __tagY = None
     __linkLine = None  # Tag與RTSP視窗的連接線
+    __recordFileName = None  # 從外界傳入的錄影檔名，該參數None時，系統自動預設
 
     def __init__(self, para):
         # 取出需用到的設定值
@@ -38,6 +39,7 @@ class RtspWindow():
         self.__tagID = para["cameraTagID"]
         self.__tagX = para["cameraTagX"]
         self.__tagY = para["cameraTagY"]
+        self.__recordFileName = para["recordFileName"]
         # 建立承載RTSP影像串流的容器物件
         self.__window = tk.Label(
             bg="black", width=self.__width, height=self.__height)
@@ -76,17 +78,20 @@ class RtspWindow():
     def __Play(self):
         # 連接RTSP串流
         video = cv2.VideoCapture(self.__url)
+        # 準備錄影路徑與檔名
+        filepath = "CameraRecord"
+        filename = self.__recordFileName
+        if self.__recordFileName is None:
+            nowTime = time.strftime('%Y%m%d%H%M%S', time.localtime())
+            filename = "Camera" + str(self.__tagID) + "-" + nowTime + ".avi"
         # 準備錄影的相關參數
-        nowTime = time.strftime('%Y%m%d%H%M%S', time.localtime())
-        recordFile = "CameraRecord/Camera" + \
-            str(self.__tagID) + "-" + nowTime + ".avi"
         recordForucc = cv2.VideoWriter_fourcc(*self.getSourceFourcc(video))
         recordFPS = int(video.get(cv2.CAP_PROP_FPS))
         recordWidth = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
         recordHeight = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
         # 建立錄影實體物件
         record = cv2.VideoWriter(
-            recordFile, recordForucc, recordFPS, (recordWidth, recordHeight))
+            filepath + "/" + filename, recordForucc, recordFPS, (recordWidth, recordHeight))
         # 讀取RTSP串流，並撥放與錄影
         (status, frame) = video.read()
         while self.__active and status:

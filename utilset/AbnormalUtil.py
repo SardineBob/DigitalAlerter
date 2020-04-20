@@ -6,13 +6,34 @@ from utilset.SqlLiteUtil import SqlLiteUtil
 class AbnormalUtil:
 
     # 新增一筆異常紀錄
-    def InsertAbnormalRecord(self, TriggerTime, TagID):
-        command = " INSERT INTO AbnormalRecord VALUES (:triggertime, :tagid) "
-        parameter = {
-            'triggertime': TriggerTime,
-            'tagid': TagID
-        }
-        SqlLiteUtil().Execute(command, parameter)
+    def InsertAbnormalRecord(self, para):
+        # 取出相關資訊，準備Insert資料
+        TriggerTime = para["triggerTime"]
+        AlertID = para["alertID"]
+        CameraInfos = para["cameraInfo"]  # this is array
+        # 準備Insert INTO指令，並執行
+        commands = []
+        # insert into AbnormalList
+        commands.append({
+            'command': " INSERT INTO AbnormalList VALUES (:triggertime, :alertid, '') ",
+            'parameter': {
+                'triggertime': TriggerTime,
+                'alertid': AlertID
+            }
+        })
+        # insert into RecordList
+        for camera in CameraInfos:
+            commands.append({
+                'command': " INSERT INTO RecordList VALUES (:triggertime, :alertid, :cameraid, '', :recordfilename) ",
+                'parameter': {
+                    'triggertime': TriggerTime,
+                    'alertid': AlertID,
+                    'cameraid': camera['cameraID'],
+                    'recordfilename': camera['recordFileName'],
+                }
+            })
+        for command in commands:
+            SqlLiteUtil().Execute(command['command'], command['parameter'])
 
     # 根據條件搜尋需要的異常紀錄
     def FindAbnormalRecord(self, TriggerTime=None, TagID=None):

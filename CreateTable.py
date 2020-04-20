@@ -8,12 +8,23 @@ if os.path.isfile('dbfile/AbnormalRecord.db'):
     exit()
 
 # create table for abnormal record
-command = "CREATE TABLE AbnormalRecord(\
-    TrigeerTime Text PRIMARY KEY,\
-    TagID INTEGER NOT NULL\
+AbnormalListcommand = "CREATE TABLE AbnormalList(\
+    TrigeerTime Text NOT NULL,\
+    AlertID INTEGER NOT NULL,\
+    AlertRemark Text NOT NULL,\
+    PRIMARY KEY (TrigeerTime, AlertID)\
+)"
+RecordListcommand = "CREATE TABLE RecordList(\
+    TrigeerTime Text NOT NULL,\
+    AlertID INTEGER NOT NULL,\
+    CameraID INTEGER NOT NULL,\
+    CameraRemark Text NOT NULL,\
+    RecordFileName Text NOT NULL,\
+    PRIMARY KEY (TrigeerTime, AlertID, CameraID)\
 )"
 
 # go to execoute
-SqlLiteUtil().Execute(command, [])
+SqlLiteUtil().Execute(AbnormalListcommand, [])
+SqlLiteUtil().Execute(RecordListcommand, [])
 
 print('DB創建成功。')

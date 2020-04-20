@@ -15,6 +15,7 @@ class CameraTag(Tag):
     __rtspOpen = False
     __rtspX = 0
     __rtspY = 0
+    __recordFileName = None
 
     def __init__(self, canvas, relocate, configItem):
         # 取出需用到的設定值
@@ -60,7 +61,8 @@ class CameraTag(Tag):
                  'relocate': self.relocate,
                  'cameraTagID': self.pointid,
                  'cameraTagX': self.tagX + (self.tagW / 2),
-                 'cameraTagY': self.tagY + (self.tagH / 2)}
+                 'cameraTagY': self.tagY + (self.tagH / 2),
+                 'recordFileName': self.__recordFileName}
             )
         # 點擊第一下開啟影像，第二下關閉影像
         if self.__rtspOpen is False:
@@ -75,3 +77,7 @@ class CameraTag(Tag):
         if self.__rtspWindow is not None:
             self.__rtspWindow.Stop()
         self.__rtspWindow = None
+
+    # 讓外界設定RTSP串流錄影檔名，讓畫面端在撥放的時候，正確的對應到錄影檔，若沒設定錄影檔名則系統自動預設
+    def SetRecordFileName(self, recordFileName):
+        self.__recordFileName = recordFileName
