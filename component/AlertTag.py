@@ -56,7 +56,7 @@ class AlertTag(Tag):
             # 警示觸發時，記錄一筆異常紀錄
             triggerTime = nowTime.strftime('%Y/%m/%d %H:%M:%S')
             AbnormalUtil().InsertAbnormalRecord({
-                'triggerTime': triggerTime,
+                'alertTime': triggerTime,
                 'alertID': self.pointid,
                 'cameraInfo': cameraInfo
             })

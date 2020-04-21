@@ -12,7 +12,7 @@ class SqlLiteUtil():
             cur = conn.cursor()
             cur.execute(sqlcommand, sqlparamter)
             conn.commit()
-            # 把結果轉為List
+            # 把結果轉為List<tuple>
             data = []
             for row in cur:
                 data.append(row)

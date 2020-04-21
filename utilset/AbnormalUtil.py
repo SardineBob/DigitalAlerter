@@ -8,25 +8,25 @@ class AbnormalUtil:
     # 新增一筆異常紀錄
     def InsertAbnormalRecord(self, para):
         # 取出相關資訊，準備Insert資料
-        TriggerTime = para["triggerTime"]
+        AlertTime = para["alertTime"]
         AlertID = para["alertID"]
         CameraInfos = para["cameraInfo"]  # this is array
         # 準備Insert INTO指令，並執行
         commands = []
         # insert into AbnormalList
         commands.append({
-            'command': " INSERT INTO AbnormalList VALUES (:triggertime, :alertid, '') ",
+            'command': " INSERT INTO AbnormalList VALUES (:alerttime, :alertid, '') ",
             'parameter': {
-                'triggertime': TriggerTime,
+                'alerttime': AlertTime,
                 'alertid': AlertID
             }
         })
         # insert into RecordList
         for camera in CameraInfos:
             commands.append({
-                'command': " INSERT INTO RecordList VALUES (:triggertime, :alertid, :cameraid, '', :recordfilename) ",
+                'command': " INSERT INTO RecordList VALUES (:alerttime, :alertid, :cameraid, '', :recordfilename) ",
                 'parameter': {
-                    'triggertime': TriggerTime,
+                    'alerttime': AlertTime,
                     'alertid': AlertID,
                     'cameraid': camera['cameraID'],
                     'recordfilename': camera['recordFileName'],
@@ -36,15 +36,43 @@ class AbnormalUtil:
             SqlLiteUtil().Execute(command['command'], command['parameter'])
 
     # 根據條件搜尋需要的異常紀錄
-    def FindAbnormalRecord(self, TriggerTime=None, TagID=None):
-        command = " SELECT * FROM AbnormalRecord WHERE 1=1 "
+    def FindAbnormalRecord(self, AlertTime=None, AlertID=None):
+        abnormalRecordList = []
+        # 先取得異常紀錄清單，即保全器材的觸發時間點
+        command = " SELECT AlertTime, AlertID FROM AbnormalList WHERE 1=1 "
         parameter = {}
         # 開始根據條件搜尋
-        if TriggerTime is not None:
-            command += " AND TriggerTime=:trigeertime "
-            parameter["trigeertime"] = TriggerTime
-        if TagID is not None:
-            command += " AND TagID=:tagid "
-            parameter["tagid"] = TagID
+        if AlertTime is not None:
+            command += " AND AlertTime=:alerttime "
+            parameter["alerttime"] = AlertTime
+        if AlertID is not None:
+            command += " AND AlertID=:alertid "
+            parameter["alertid"] = AlertID
+        abnormalList = SqlLiteUtil().Execute(command, parameter)
+        # 逐一取得觸發時間點，對應各攝影機的錄影檔名資訊
+        for abnormalItem in abnormalList:
+            alertTime, alertID = abnormalItem
+            # 取得這個觸發時間點，攝影機錄影檔名
+            command = " SELECT CameraID, RecordFileName FROM RecordList WHERE AlertTime=:alerttime AND AlertID=:alertid "
+            parameter = {
+                'alerttime': alertTime,
+                'alertid': alertID
+            }
+            recordList = SqlLiteUtil().Execute(command, parameter)
+            # 將錄影檔名，整理成List<Object>放進異常紀錄清單
+            cameraList = []
+            for recordItem in recordList:
+                cameraID, recordFileName = recordItem
+                cameraList.append({
+                    'cameraID': cameraID,
+                    'recordFileName': recordFileName
+                })
 
-        return SqlLiteUtil().Execute(command, parameter)
+            # 加工與結合查詢結果，轉為List<Object>形式回傳
+            abnormalRecordList.append({
+                'alertTime': alertTime,
+                'alertID': alertID,
+                'cameraInfo': cameraList
+            })
+
+        return abnormalRecordList

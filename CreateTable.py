@@ -9,18 +9,18 @@ if os.path.isfile('dbfile/AbnormalRecord.db'):
 
 # create table for abnormal record
 AbnormalListcommand = "CREATE TABLE AbnormalList(\
-    TrigeerTime Text NOT NULL,\
+    AlertTime Text NOT NULL,\
     AlertID INTEGER NOT NULL,\
     AlertRemark Text NOT NULL,\
-    PRIMARY KEY (TrigeerTime, AlertID)\
+    PRIMARY KEY (AlertTime, AlertID)\
 )"
 RecordListcommand = "CREATE TABLE RecordList(\
-    TrigeerTime Text NOT NULL,\
+    AlertTime Text NOT NULL,\
     AlertID INTEGER NOT NULL,\
     CameraID INTEGER NOT NULL,\
     CameraRemark Text NOT NULL,\
     RecordFileName Text NOT NULL,\
-    PRIMARY KEY (TrigeerTime, AlertID, CameraID)\
+    PRIMARY KEY (AlertTime, AlertID, CameraID)\
 )"
 
 # go to execoute
