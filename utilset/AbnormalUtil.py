@@ -37,9 +37,8 @@ class AbnormalUtil:
 
     # 根據條件搜尋需要的異常紀錄
     def FindAbnormalRecord(self, AlertTime=None, AlertID=None):
-        abnormalRecordList = []
         # 先取得異常紀錄清單，即保全器材的觸發時間點
-        command = " SELECT AlertTime, AlertID FROM AbnormalList WHERE 1=1 "
+        command = " SELECT AlertTime, AlertID FROM AbnormalList WHERE 1=1 ORDER BY AlertTime DESC"
         parameter = {}
         # 開始根據條件搜尋
         if AlertTime is not None:
@@ -48,31 +47,31 @@ class AbnormalUtil:
         if AlertID is not None:
             command += " AND AlertID=:alertid "
             parameter["alertid"] = AlertID
-        abnormalList = SqlLiteUtil().Execute(command, parameter)
-        # 逐一取得觸發時間點，對應各攝影機的錄影檔名資訊
-        for abnormalItem in abnormalList:
-            alertTime, alertID = abnormalItem
-            # 取得這個觸發時間點，攝影機錄影檔名
-            command = " SELECT CameraID, RecordFileName FROM RecordList WHERE AlertTime=:alerttime AND AlertID=:alertid "
-            parameter = {
-                'alerttime': alertTime,
-                'alertid': alertID
-            }
-            recordList = SqlLiteUtil().Execute(command, parameter)
-            # 將錄影檔名，整理成List<Object>放進異常紀錄清單
-            cameraList = []
-            for recordItem in recordList:
-                cameraID, recordFileName = recordItem
-                cameraList.append({
-                    'cameraID': cameraID,
-                    'recordFileName': recordFileName
-                })
-
-            # 加工與結合查詢結果，轉為List<Object>形式回傳
-            abnormalRecordList.append({
-                'alertTime': alertTime,
-                'alertID': alertID,
-                'cameraInfo': cameraList
+        # 加工將List<tuple>轉List<Object>型態
+        data = []
+        result = SqlLiteUtil().Execute(command, parameter)
+        for item in result:
+            data.append({
+                'AlertTime': item[0],
+                'AlertID': item[1]
             })
 
-        return abnormalRecordList
+        return data
+
+    # 根據警示時間以及警示點ID，查詢可查看的錄影片段清單
+    def FindRecordList(self, AlertTime, AlertID):
+        command = " SELECT CameraID, RecordFileName FROM RecordList WHERE AlertTime=:alerttime AND AlertID=:alertid "
+        parameter = {
+            'alerttime': AlertTime,
+            'alertid': AlertID
+        }
+        # 加工將List<tuple>轉List<Object>型態
+        data = []
+        result = SqlLiteUtil().Execute(command, parameter)
+        for item in result:
+            data.append({
+                'CameraID': item[0],
+                'RecordFileName': item[1]
+            })
+
+        return data
