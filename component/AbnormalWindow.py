@@ -122,10 +122,10 @@ class AbnormalWindow():
         # 根據index到List取得錄影片段檔名
         videoFileName = self.__videoList[index]['RecordFileName']
         # 透過Window Media Plyer播放影片
+        playerPath = "C:/Program Files/Windows Media Player/wmplayer.exe"
         videoPath = os.path.join(
             os.path.abspath('.'), 'CameraRecord', videoFileName)
-        subprocess.Popen(
-            '"C:\Program Files\Windows Media Player\wmplayer.exe" ' + videoPath)
+        subprocess.Popen(playerPath + ' ' + videoPath)
 
     # 視窗關閉，用於外部呼叫
     def WindowClose(self):
