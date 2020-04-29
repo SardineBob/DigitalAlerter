@@ -38,15 +38,17 @@ class AbnormalUtil:
     # 根據條件搜尋需要的異常紀錄
     def FindAbnormalRecord(self, AlertTime=None, AlertID=None):
         # 先取得異常紀錄清單，即保全器材的觸發時間點
-        command = " SELECT AlertTime, AlertID FROM AbnormalList WHERE 1=1 ORDER BY AlertTime DESC"
+        command = " SELECT AlertTime, AlertID FROM AbnormalList WHERE 1=1 "
         parameter = {}
         # 開始根據條件搜尋
         if AlertTime is not None:
-            command += " AND AlertTime=:alerttime "
-            parameter["alerttime"] = AlertTime
+            command += " AND AlertTime LIKE :alerttime "
+            parameter["alerttime"] = AlertTime + "%"
         if AlertID is not None:
             command += " AND AlertID=:alertid "
             parameter["alertid"] = AlertID
+        # 加入排序語法
+        command += " ORDER BY AlertTime DESC "
         # 加工將List<tuple>轉List<Object>型態
         data = []
         result = SqlLiteUtil().Execute(command, parameter)

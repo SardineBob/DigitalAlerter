@@ -12,6 +12,8 @@ class AbnormalWindow():
     __listBox = None
     __closeMethod = None  # 呼叫端關閉本視窗的方法，通常包含呼叫本class的close event，以及呼叫端管理class關閉的實作方法
     __videoList = None  # 目前載入的錄影片段清單
+    __PanelLayout = None  # 定義各元件部屬在Grid的位置
+    __queryDate = None  # 存放輸入之查詢日期
 
     def __init__(self, para):
         # 取出需使用的設定值
@@ -26,16 +28,67 @@ class AbnormalWindow():
 
     # 產生版面(左版面：異常紀錄清單，右版面：選取異常紀錄之對應的錄影檔)
     def __CreatePanel(self):
-        # 設定Grid版面配置比例
+        # 設定Grid版面配置比例(最外層主要容器)
         self.__window.grid_columnconfigure(0, weight=1)
         self.__window.grid_columnconfigure(1, weight=1)
-        self.__window.grid_rowconfigure(1, weight=1)
+        self.__window.grid_rowconfigure(2, weight=1)
+        # 定義外層主要容器的版面配置定位點
+        self.__PanelLayout = {
+            'queryBar': {'row': 0, 'column': 0, 'sticky': 'EWNS', 'columnspan': 2},
+            'queryBar.dateLabel': {'row': 0, 'column': 0, 'sticky': 'EWNS'},
+            'queryBar.dateBox': {'row': 0, 'column': 1, 'sticky': 'EWNS'},
+            'queryBar.alertLabel': {'row': 1, 'column': 0, 'sticky': 'EWNS'},
+            'queryBar.alertSelect': {'row': 1, 'column': 1, 'sticky': 'EWNS'},
+            'treeView': {'row': 1, 'column': 0, 'sticky': 'EWNS', 'rowspan': 2},
+            'title': {'row': 1, 'column': 1, 'sticky': 'EWNS'},
+            'listBox': {'row': 2, 'column': 1, 'sticky': 'EWNS'}
+        }
+        # 建立查詢區塊
+        self.__CreateQueryBar()
         # 建立異常紀錄清單
         self.__CreateAbnormalTable()
         # 右邊版面標題
         title = tk.Label(self.__window, text="錄影片段", font=(
             "微軟正黑體", 12, "bold"), background="#DDDDDD")
-        title.grid(row=0, column=1, sticky='EWNS')
+        title.grid(self.__PanelLayout['title'])
+        # 產生錄影片段選單
+        self.__CreateVideoList()
+
+    # 建立查詢區塊本體
+    def __CreateQueryBar(self):
+        # 建立一個查詢區塊容器，並建構在主容器中
+        QueryBar = tk.Frame(self.__window)
+        # 設定查詢區塊容器的版面配置比例
+        QueryBar.grid_columnconfigure(0, weight=1)
+        QueryBar.grid_columnconfigure(1, weight=4)
+        QueryBar.grid(self.__PanelLayout['queryBar'])
+        # 建立異常日期查詢功能列
+        dateLabel = tk.Label(QueryBar, text="異常日期(yyyy/mm/dd)", font=(
+            "微軟正黑體", 12, "bold"), background="#DDDDDD")
+        dateLabel.grid(self.__PanelLayout['queryBar.dateLabel'])
+        dateBox = tk.Entry(QueryBar, font=("微軟正黑體", 12, "bold"))
+        dateBox.grid(self.__PanelLayout['queryBar.dateBox'])
+
+        # 日期查詢輸入事件
+        def dateBoxInput(event):
+            # 值沒有變不需執行
+            if self.__queryDate == dateBox.get():
+                return
+            # 強制把輸入空值轉為None
+            self.__queryDate = None if dateBox.get() == '' else dateBox.get()
+            # 更新異常紀錄清單
+            self.__LoadAbnormalTable(self.__queryDate, None)
+        # 綁定loass focus跟按enter的事件
+        dateBox.bind('<FocusOut>', dateBoxInput)
+        dateBox.bind('<Return>', dateBoxInput)
+
+        # 建立警報點查詢功能列
+        alertLabel = tk.Label(QueryBar, text="警報位置", font=(
+            "微軟正黑體", 12, "bold"), background="#DDDDDD")
+        alertLabel.grid(self.__PanelLayout['queryBar.alertLabel'])
+        alertSelect = tk.Label(QueryBar, text="這裡會放select", font=(
+            "微軟正黑體", 12, "bold"), background="red")
+        alertSelect.grid(self.__PanelLayout['queryBar.alertSelect'])
 
     # 建立異常紀錄清單表格本體
     def __CreateAbnormalTable(self):
@@ -49,7 +102,7 @@ class AbnormalWindow():
                                width=100, anchor=tk.CENTER)
         # 定義標題
         self.__treeView.heading("TriggerTime", text="異常觸發時間")
-        self.__treeView.heading("AlertID", text="警報點ID")
+        self.__treeView.heading("AlertID", text="警報位置")
         # 設定treeview的樣式
         style = ttk.Style()
         style.configure("Treeview", font=("微軟正黑體", 12))
@@ -59,12 +112,14 @@ class AbnormalWindow():
         # 載入資料
         self.__LoadAbnormalTable()
         # 左邊滿版，擺入異常紀錄清單
-        self.__treeView.grid(row=0, column=0, sticky='EWNS', rowspan=2)
+        self.__treeView.grid(self.__PanelLayout['treeView'])
 
     # 讀取異常清單表格
-    def __LoadAbnormalTable(self):
+    def __LoadAbnormalTable(self, AlertTime=None, AlertID=None):
+        # 清空treeview(星號(*)，類似視為Tuple)
+        self.__treeView.delete(*self.__treeView.get_children())
         # 撈取異常紀錄清單資料
-        data = AbnormalUtil().FindAbnormalRecord()
+        data = AbnormalUtil().FindAbnormalRecord(AlertTime, AlertID)
         # 逐筆呈現在表格內
         for item in data:
             itemFormat = "even" if data.index(item) % 2 == 0 else "odd"
@@ -85,19 +140,18 @@ class AbnormalWindow():
         selectedAlertTime = selectedData[0]
         selectedAlertID = selectedData[1]
         # 觸發更新錄影片段清單
-        self.__CreateVideoList(selectedAlertTime, selectedAlertID)
+        self.__LoadVideoList(selectedAlertTime, selectedAlertID)
 
     # 建立錄影片段清單本體
-    def __CreateVideoList(self, AlertTime, AlertID):
+    def __CreateVideoList(self):
+        if self.__listBox is not None:
+            return
         # ListBox初始設定
-        if self.__listBox is None:
-            self.__listBox = tk.Listbox(self.__window)
-            self.__listBox.configure(
-                font=("微軟正黑體", 12), justify="center", highlightthickness=0)
-        # 載入錄影片段清單資料
-        self.__LoadVideoList(AlertTime, AlertID)
+        self.__listBox = tk.Listbox(self.__window)
+        self.__listBox.configure(
+            font=("微軟正黑體", 12), justify="center", highlightthickness=0)
         # 右邊版面內容，擺入選取之異常紀錄的錄影檔選單
-        self.__listBox.grid(row=1, column=1, sticky="EWNS")
+        self.__listBox.grid(self.__PanelLayout['listBox'])
 
     # 讀取錄影片段清單
     def __LoadVideoList(self, AlertTime, AlertID):
