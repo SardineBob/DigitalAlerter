@@ -3,6 +3,7 @@ import subprocess
 import tkinter as tk
 from tkinter import ttk
 from utilset.AbnormalUtil import AbnormalUtil
+from utilset.ConfigUtil import ConfigUtil
 
 
 class AbnormalWindow():
@@ -14,6 +15,7 @@ class AbnormalWindow():
     __videoList = None  # 目前載入的錄影片段清單
     __PanelLayout = None  # 定義各元件部屬在Grid的位置
     __queryDate = None  # 存放輸入之查詢日期
+    __queryAlert = None  # 存放選取之警報點位置
 
     def __init__(self, para):
         # 取出需使用的設定值
@@ -77,7 +79,7 @@ class AbnormalWindow():
             # 強制把輸入空值轉為None
             self.__queryDate = None if dateBox.get() == '' else dateBox.get()
             # 更新異常紀錄清單
-            self.__LoadAbnormalTable(self.__queryDate, None)
+            self.__LoadAbnormalTable(self.__queryDate, self.__queryAlert)
         # 綁定loass focus跟按enter的事件
         dateBox.bind('<FocusOut>', dateBoxInput)
         dateBox.bind('<Return>', dateBoxInput)
@@ -86,9 +88,28 @@ class AbnormalWindow():
         alertLabel = tk.Label(QueryBar, text="警報位置", font=(
             "微軟正黑體", 12, "bold"), background="#DDDDDD")
         alertLabel.grid(self.__PanelLayout['queryBar.alertLabel'])
-        alertSelect = tk.Label(QueryBar, text="這裡會放select", font=(
-            "微軟正黑體", 12, "bold"), background="red")
+        alertSelect = ttk.Combobox(QueryBar, font=(
+            "微軟正黑體", 12, "bold"), state="readonly", values=self.__getAlertNameList())
         alertSelect.grid(self.__PanelLayout['queryBar.alertSelect'])
+
+        # 警報位置查詢選取事件
+        def alertBoxSelect(event):
+            # 值沒有變不需執行
+            if self.__queryAlert == alertSelect.get():
+                return
+            # 強制把輸入空值轉為None
+            self.__queryAlert = None if alertSelect.get() == '' else alertSelect.get()
+            # 更新異常紀錄清單
+            self.__LoadAbnormalTable(self.__queryDate, self.__queryAlert)
+        # 綁定選取下拉選單事件
+        alertSelect.bind("<<ComboboxSelected>>", alertBoxSelect)
+
+    # 讀取警報點位置選取清單
+    def __getAlertNameList(self):
+        list = []
+        for point in ConfigUtil().AlertPoints:
+            list.append(point['number'])
+        return list
 
     # 建立異常紀錄清單表格本體
     def __CreateAbnormalTable(self):
