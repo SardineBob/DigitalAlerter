@@ -6,7 +6,7 @@ from component.WindowRelocate import WindowRelocate
 from component.AlertTag import AlertTag
 from component.CameraTag import CameraTag
 from component.RaspberryPiSignal import RaspberryPiSignal
-from component.AbnormalWindow import AbnormalWindow
+from component.Abnormal.AbnormalWindow import AbnormalWindow
 
 
 class MainWindow():
