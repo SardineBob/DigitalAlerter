@@ -78,6 +78,9 @@ class RtspWindow():
     def __Play(self):
         # 連接RTSP串流
         video = cv2.VideoCapture(self.__url)
+        # resize RTSP串流影像
+        video.set(cv2.CAP_PROP_FRAME_WIDTH,320)
+        video.set(cv2.CAP_PROP_FRAME_HEIGHT,240)
         # 準備錄影路徑與檔名
         filepath = "CameraRecord"
         filename = self.__recordFileName
@@ -99,6 +102,7 @@ class RtspWindow():
             record.write(frame)  # 錄製影片到檔案
             imgArray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
             image = Image.fromarray(imgArray)
+            image.thumbnail((320,240)) # 縮小尺寸為320*240
             photo = ImageTk.PhotoImage(image=image)
             if hasattr(self.__window, 'configure') is True:
                 self.__window.configure(
