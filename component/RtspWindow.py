@@ -27,6 +27,7 @@ class RtspWindow():
     __tagY = None
     __linkLine = None  # Tag與RTSP視窗的連接線
     __recordFileName = None  # 從外界傳入的錄影檔名，該參數None時，系統自動預設
+    __frameSize = (480, 270)  # 定義一個frame要縮小到多少尺寸
 
     def __init__(self, para):
         # 取出需用到的設定值
@@ -78,9 +79,9 @@ class RtspWindow():
     def __Play(self):
         # 連接RTSP串流
         video = cv2.VideoCapture(self.__url)
-        # resize RTSP串流影像
-        video.set(cv2.CAP_PROP_FRAME_WIDTH,320)
-        video.set(cv2.CAP_PROP_FRAME_HEIGHT,240)
+        # 設定一個frame的尺寸
+        self.__frameSize = (int(video.get(cv2.CAP_PROP_FRAME_WIDTH) / 4),
+                            int(video.get(cv2.CAP_PROP_FRAME_HEIGHT) / 4))
         # 準備錄影路徑與檔名
         filepath = "CameraRecord"
         filename = self.__recordFileName
@@ -90,19 +91,20 @@ class RtspWindow():
         # 準備錄影的相關參數
         recordForucc = cv2.VideoWriter_fourcc(*self.getSourceFourcc(video))
         recordFPS = int(video.get(cv2.CAP_PROP_FPS))
-        recordWidth = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
-        recordHeight = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+        #recordWidth = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+        #recordHeight = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
         # 建立錄影實體物件
         record = cv2.VideoWriter(
-            filepath + "/" + filename, recordForucc, recordFPS, (recordWidth, recordHeight))
+            filepath + "/" + filename, recordForucc, recordFPS, self.__frameSize)
         # 讀取RTSP串流，並撥放與錄影
         (status, frame) = video.read()
         while self.__active and status:
             (status, frame) = video.read()
+            # resize frame
+            frame = cv2.resize(frame, self.__frameSize)
             record.write(frame)  # 錄製影片到檔案
             imgArray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
             image = Image.fromarray(imgArray)
-            image.thumbnail((320,240)) # 縮小尺寸為320*240
             photo = ImageTk.PhotoImage(image=image)
             if hasattr(self.__window, 'configure') is True:
                 self.__window.configure(
