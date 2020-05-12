@@ -4,7 +4,7 @@ import threading
 
 class RaspberryPiSignal:
 
-    __wsUrl = "ws://localhost:9453"
+    __wsUrl = "ws://raspberrypi:9453"
     __ws = None
     __task = None
     __alertTagCollection = None

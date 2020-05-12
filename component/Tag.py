@@ -8,6 +8,7 @@ class Tag():
     tagid = None
     bgid = None
     pointid = None
+    name = None
     tagX = 0  # 目前tag的座標位置
     tagY = 0
     tagW = 0
@@ -15,10 +16,11 @@ class Tag():
     oriTagX = 0  # 初始化時tag的座標位置，作為計算視窗縮放後新座標基準
     oriTagY = 0
 
-    def __init__(self, canvas, relocate, pointid, x, y, picPhoto, tagName):
+    def __init__(self, canvas, relocate, pointid, name, x, y, picPhoto, tagName):
         self.canvas = canvas
         self.relocate = relocate
         self.pointid = pointid
+        self.name = name
         self.tagX = self.oriTagX = x
         self.tagY = self.oriTagY = y
         self.tagW = picPhoto.width()
