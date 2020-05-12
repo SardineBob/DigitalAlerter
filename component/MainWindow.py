@@ -64,6 +64,7 @@ class MainWindow():
         # 建立保全器材(警報點)與攝影機的連結關係
         for item in self.__alertTags:
             item.linkCamera(self.__cameraTags)
+            item.linkAbnormalWindow(self.__openAbnormalWindow)
 
         # 給兩個按鈕來測試閃爍
         def click1():
@@ -81,10 +82,7 @@ class MainWindow():
             self.__test = RaspberryPiSignal(self.__alertTags)
 
         def click4():
-            if self.__AbnormalWindow is None:
-                self.__AbnormalWindow = AbnormalWindow({
-                    "closeMethod": click5
-                })
+            self.__openAbnormalWindow()
             # 自訂一個dialog box
             #test = tk.Tk()
             #test.master = self.__mainWindow
@@ -102,25 +100,22 @@ class MainWindow():
             # self.newfream.geometry("640x480+50+50")
 
         def click5():
-            if self.__AbnormalWindow is not None:
-                self.__AbnormalWindow.WindowClose()
-                self.__AbnormalWindow = None
-
+            self.__closeAbnormalWindow()
             # test.mainloop()
 
-        # def click3():
-        # self.__window = CameraWindow(
-        #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 100, 100)
-        # self.__window1 = CameraWindow(
-        #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 100, 270)
-        # self.__window2 = CameraWindow(
-        #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 350, 100)
-        # self.__window3 = CameraWindow(
-        #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 350, 270)
-        # self.__window.Start()
-        # self.__window1.Start()
-        # self.__window2.Start()
-        # self.__window3.Start()
+            # def click3():
+            # self.__window = CameraWindow(
+            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 100, 100)
+            # self.__window1 = CameraWindow(
+            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 100, 270)
+            # self.__window2 = CameraWindow(
+            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 350, 100)
+            # self.__window3 = CameraWindow(
+            #    'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov', 350, 270)
+            # self.__window.Start()
+            # self.__window1.Start()
+            # self.__window2.Start()
+            # self.__window3.Start()
 
         button1 = tk.Button(text='啟動', command=click1)
         button1.place(x=10, y=10)
@@ -165,3 +160,18 @@ class MainWindow():
                 # 更新目前視窗寬高
                 self.__curWidth = event.width
                 self.__curHeight = event.height
+
+    # 開啟異常紀錄清單視窗
+    def __openAbnormalWindow(self):
+        if self.__AbnormalWindow is None:
+            self.__AbnormalWindow = AbnormalWindow({
+                "closeMethod": self.__closeAbnormalWindow
+            })
+        # 這個return是提供外界去承接這個物件，呼叫裡面方法
+        return self.__AbnormalWindow
+
+    # 關閉異常紀錄清單視窗
+    def __closeAbnormalWindow(self):
+        if self.__AbnormalWindow is not None:
+            self.__AbnormalWindow.WindowClose()
+            self.__AbnormalWindow = None

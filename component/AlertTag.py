@@ -85,3 +85,9 @@ class AlertTag(Tag):
         self.__cameraMappingTag = []
         for id in self.__cameraMappingID:
             self.__cameraMappingTag.append(cameraTagCollection[id-1])
+
+    # 連結異常紀錄清單，點擊該AlertTag的時候，開啟異常紀錄視窗，並直接切換到這一個警示點的異常紀錄清單
+    def linkAbnormalWindow(self, openMethod):
+        # 註冊開啟異常紀錄視窗事件
+        self.canvas.tag_bind(self.tagid, '<Button-1>',
+                             lambda event: openMethod().queryBar.QueryAlertCombo(self.pointid))

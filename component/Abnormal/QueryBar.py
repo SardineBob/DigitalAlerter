@@ -99,3 +99,9 @@ class QueryBar():
             itemText = str(point['number']) + "." + str(point['name'])
             list.append(itemText)
         return list
+
+    # 提供外界直接切換至某警示點檢視異常紀錄的方法
+    def QueryAlertCombo(self, AlertID):
+        self.__AlertCombo.current(AlertID)
+        self.__AlertComboOnchangeEvent(None)
+
