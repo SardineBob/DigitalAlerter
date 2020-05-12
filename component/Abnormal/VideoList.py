@@ -40,8 +40,8 @@ class VideoList():
         # 逐筆呈現於ListBox
         for item in self.__videoList:
             index = self.__videoList.index(item)
-            cameraID = item['CameraID']
-            self.__listBox.insert(index, cameraID)
+            cameraName = str(item['CameraID']) + "." + str(item['CameraName'])
+            self.__listBox.insert(index, cameraName)
         # 綁定選取事件
         self.__listBox.bind('<Double-1>', self.__ListBoxSelectedEvent)
 

@@ -86,7 +86,7 @@ class QueryBar():
             return
         # 強制把輸入空值轉為None
         self.__AlertCondition = \
-            None if self.__AlertCombo.get() == '' else self.__AlertCombo.get()
+            None if self.__AlertCombo.get() == '' else self.__AlertCombo.get().split('.')[0]
         # 更新異常紀錄清單
         if self.__ReloadDataEvent is not None:
             self.__ReloadDataEvent(self.__DateCondition, self.__AlertCondition)
@@ -96,5 +96,6 @@ class QueryBar():
         list = []
         list.append('')
         for point in ConfigUtil().AlertPoints:
-            list.append(point['number'])
+            itemText = str(point['number']) + "." + str(point['name'])
+            list.append(itemText)
         return list

@@ -20,6 +20,7 @@ class CameraTag(Tag):
     def __init__(self, canvas, relocate, configItem):
         # 取出需用到的設定值
         pointid = configItem["number"]
+        name = configItem["name"]
         x = configItem["X"]
         y = configItem["Y"]
         self.__rtspUrl = configItem["rtspUrl"]
@@ -31,7 +32,7 @@ class CameraTag(Tag):
             canvas.cameraIcon = []
         canvas.cameraIcon.append(picPhoto)
         # 傳入父類別，建立攝影機標籤物件
-        super().__init__(canvas, relocate, pointid, x, y, picPhoto, 'camera')
+        super().__init__(canvas, relocate, pointid, name, x, y, picPhoto, 'camera')
         # 綁定Click事件到全部擁有camera這個tags的物件
         canvas.tag_bind(self.tagid, '<Button-1>', self.__CameraClickEvent)
 

@@ -10,25 +10,28 @@ class AbnormalUtil:
         # 取出相關資訊，準備Insert資料
         AlertTime = para["alertTime"]
         AlertID = para["alertID"]
+        AlertName = para["alertName"]
         CameraInfos = para["cameraInfo"]  # this is array
         # 準備Insert INTO指令，並執行
         commands = []
         # insert into AbnormalList
         commands.append({
-            'command': " INSERT INTO AbnormalList VALUES (:alerttime, :alertid, '') ",
+            'command': " INSERT INTO AbnormalList VALUES (:alerttime, :alertid, :alertname) ",
             'parameter': {
                 'alerttime': AlertTime,
-                'alertid': AlertID
+                'alertid': AlertID,
+                'alertname': AlertName
             }
         })
         # insert into RecordList
         for camera in CameraInfos:
             commands.append({
-                'command': " INSERT INTO RecordList VALUES (:alerttime, :alertid, :cameraid, '', :recordfilename) ",
+                'command': " INSERT INTO RecordList VALUES (:alerttime, :alertid, :cameraid, :cameraname, :recordfilename) ",
                 'parameter': {
                     'alerttime': AlertTime,
                     'alertid': AlertID,
                     'cameraid': camera['cameraID'],
+                    'cameraname': camera['cameraName'],
                     'recordfilename': camera['recordFileName'],
                 }
             })
@@ -38,7 +41,7 @@ class AbnormalUtil:
     # 根據條件搜尋需要的異常紀錄
     def FindAbnormalRecord(self, AlertTime=None, AlertID=None):
         # 先取得異常紀錄清單，即保全器材的觸發時間點
-        command = " SELECT AlertTime, AlertID FROM AbnormalList WHERE 1=1 "
+        command = " SELECT AlertTime, AlertID, AlertName FROM AbnormalList WHERE 1=1 "
         parameter = {}
         # 開始根據條件搜尋
         if AlertTime is not None:
@@ -55,14 +58,15 @@ class AbnormalUtil:
         for item in result:
             data.append({
                 'AlertTime': item[0],
-                'AlertID': item[1]
+                'AlertID': item[1],
+                'AlertName': item[2]
             })
 
         return data
 
     # 根據警示時間以及警示點ID，查詢可查看的錄影片段清單
     def FindRecordList(self, AlertTime, AlertID):
-        command = " SELECT CameraID, RecordFileName FROM RecordList WHERE AlertTime=:alerttime AND AlertID=:alertid "
+        command = " SELECT CameraID, CameraName, RecordFileName FROM RecordList WHERE AlertTime=:alerttime AND AlertID=:alertid "
         parameter = {
             'alerttime': AlertTime,
             'alertid': AlertID
@@ -73,7 +77,8 @@ class AbnormalUtil:
         for item in result:
             data.append({
                 'CameraID': item[0],
-                'RecordFileName': item[1]
+                'CameraName': item[1],
+                'RecordFileName': item[2]
             })
 
         return data

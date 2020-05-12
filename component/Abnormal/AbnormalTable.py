@@ -23,14 +23,14 @@ class AbnormalTable():
     # 建立異常紀錄清單表格
     def __Create(self):
         # 定義欄位
-        self.__treeView["columns"] = ("TriggerTime", "AlertID")
+        self.__treeView["columns"] = ("TriggerTime", "AlertName")
         self.__treeView.column("TriggerTime", minwidth=170,
                                width=170, anchor=tk.CENTER)
-        self.__treeView.column("AlertID", minwidth=100,
+        self.__treeView.column("AlertName", minwidth=100,
                                width=100, anchor=tk.CENTER)
         # 定義標題
         self.__treeView.heading("TriggerTime", text="異常觸發時間")
-        self.__treeView.heading("AlertID", text="警報位置")
+        self.__treeView.heading("AlertName", text="警報位置")
         # 設定treeview的樣式
         style = ttk.Style()
         style.configure("Treeview", font=("微軟正黑體", 12))
@@ -53,10 +53,10 @@ class AbnormalTable():
             itemFormat = "even" if data.index(item) % 2 == 0 else "odd"
             # 取出各欄位資料
             alertTime = item['AlertTime']
-            alertID = item['AlertID']
+            alertName = str(item['AlertID']) + "." + str(item['AlertName'])
             # 透過treeview呈現
             self.__treeView.insert("", "end", value=(
-                alertTime, alertID), tags=(itemFormat))
+                alertTime, alertName), tags=(itemFormat))
         # 綁定選取的事件
         self.__treeView.bind('<Button-1>', self.__TreeViewOnchangeEvent)
 
@@ -68,7 +68,7 @@ class AbnormalTable():
         if selectedData is '':
             return
         selectedAlertTime = selectedData[0]
-        selectedAlertID = selectedData[1]
+        selectedAlertID = selectedData[1].split('.')[0]
         # 觸發更新錄影片段清單
         if self.__ReloadDataEvent is not None:
             self.__ReloadDataEvent(selectedAlertTime, selectedAlertID)
