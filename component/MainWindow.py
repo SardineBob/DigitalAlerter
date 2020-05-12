@@ -32,7 +32,7 @@ class MainWindow():
     def __init__(self):
         # 準備主要視窗設定
         self.__mainWindow = tk.Tk()
-        self.__mainWindow.title("Digital Alerter(ver.0.0.2)")
+        self.__mainWindow.title("Digital Alerter(ver.0.5.0)")
         self.__mainWindow.geometry("%dx%d" % (
             self.__originWidth, self.__originHeight))
         # 註冊視窗事件
