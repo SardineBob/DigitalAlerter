@@ -61,9 +61,11 @@ class MainWindow():
         for item in self.__configUtil.cameraPoints:
             self.__cameraTags.append(
                 CameraTag(self.__canvas, self.__windowRelocate, item))
-        # 建立保全器材(警報點)與攝影機的連結關係
+        # 建立保全器材(警報點)與其他組件連結關係
         for item in self.__alertTags:
+            # 建立保全器材(警報點)與攝影機的連結關係
             item.linkCamera(self.__cameraTags)
+            # 建立保全器材(警報點)與異常紀錄視窗的連結關係
             item.linkAbnormalWindow(self.__openAbnormalWindow)
 
         # 給兩個按鈕來測試閃爍
