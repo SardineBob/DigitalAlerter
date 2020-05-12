@@ -17,7 +17,7 @@ class ConfigUtil():
             exit()
         # 讀取設定檔
         config = configparser.ConfigParser()
-        config.read(self.__filePath)
+        config.read(self.__filePath, encoding="UTF-8")
         # 讀取警報器材位置
         self.AlertPoints = json.loads(config["AlertPoint"]["point"])
         # 讀取攝影機位置
