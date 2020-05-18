@@ -9,6 +9,7 @@ class ConfigUtil():
     __filePath = 'config.ini'
     AlertPoints = None
     cameraPoints = None
+    RaspberryPis = None
 
     def __init__(self):
         # 判斷設定檔是否存在
@@ -22,3 +23,5 @@ class ConfigUtil():
         self.AlertPoints = json.loads(config["AlertPoint"]["point"])
         # 讀取攝影機位置
         self.cameraPoints = json.loads(config["CameraPoint"]["point"])
+        # 讀取樹梅派Websocket位址
+        self.RaspberryPis = json.loads(config["RaspberryPiWebsocket"]["device"])

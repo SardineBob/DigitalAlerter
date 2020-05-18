@@ -5,6 +5,9 @@ import threading
 from datetime import datetime
 from utilset.AbnormalUtil import AbnormalUtil
 
+# 背景圓：平常為綠色，警報發生時，呈現紅色閃爍
+# 狀態環：識別樹梅派WebSocket訊號是否連結的呈現(紅色：未連結，藍色：已連結)
+
 
 class AlertTag(Tag):
 
@@ -30,6 +33,8 @@ class AlertTag(Tag):
         canvas.alertIcon.append(picPhoto)
         # 傳入父類別，建立警報點標籤物件
         super().__init__(canvas, relocate, pointid, name, x, y, picPhoto, 'alert')
+        # 預設狀態環為未與樹梅派連接
+        self.setOnlineStatus(False)
 
     # 標籤觸發警報動作，閃爍背景(紅色)來達到視覺注目效果(使用執行序來跑，以免畫面lock)
     def TriggerAlert(self):
@@ -91,3 +96,10 @@ class AlertTag(Tag):
         # 註冊開啟異常紀錄視窗事件
         self.canvas.tag_bind(self.tagid, '<Button-1>',
                              lambda event: openMethod().queryBar.QueryAlertCombo(self.pointid))
+
+    # 讓外界呼叫，根據與樹梅派連接之上線狀況，切換狀態環的顏色
+    def setOnlineStatus(self, onlineStatus):
+        if onlineStatus:
+            self.canvas.itemconfig(self.ringid, outline="#0000ff")
+        else:
+            self.canvas.itemconfig(self.ringid, outline="#ff0000")

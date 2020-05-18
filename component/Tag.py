@@ -7,6 +7,7 @@ class Tag():
     relocate = None
     tagid = None
     bgid = None
+    ringid = None
     pointid = None
     name = None
     tagX = 0  # 目前tag的座標位置
@@ -25,7 +26,7 @@ class Tag():
         self.tagY = self.oriTagY = y
         self.tagW = picPhoto.width()
         self.tagH = picPhoto.height()
-        # 先繪製Tag背景圓型，並預設為綠色(警報時為紅色)(__getBGCoords=>計算微調背景圓型在tag的位置)
+        # 繪製Tag背景圓型
         self.bgid = canvas.create_oval(
             self.getBGCoords(self.tagX, self.tagY),
             fill='#00ff00',
@@ -34,15 +35,23 @@ class Tag():
         # 繪製Tag圖示
         self.tagid = canvas.create_image(
             x, y, image=picPhoto, anchor=tk.NW, tags=tagName)
+        # 繪製Tag狀態環，可根據Tag特性，透過顏色識別目前物件的狀態
+        self.ringid = self.canvas.create_oval(
+            self.getRingCoords(self.tagX, self.tagY),
+            outline='#000000',
+            width=3
+        )
 
     def Relocate(self):
         # 取得因為視窗縮放產生的新座標
         result = self.relocate.Relocate(self.oriTagX, self.oriTagY)
         self.tagX = result["newX"]
         self.tagY = result["newY"]
-        # 重新定位tag(包含背景)的位置
+        # 重新定位tag(包含背景與狀態環)的位置
         self.canvas.coords(self.tagid, self.tagX, self.tagY)
         self.canvas.coords(self.bgid, self.getBGCoords(self.tagX, self.tagY))
+        self.canvas.coords(
+            self.ringid, self.getRingCoords(self.tagX, self.tagY))
 
     # 計算Tag背景的圓型位置，這邊只是微調一下，讓畫面好看
     def getBGCoords(self, tagX, tagY):
@@ -51,4 +60,13 @@ class Tag():
             tagY + 1,
             tagX + self.tagW,
             tagY + 1 + self.tagH
+        )
+
+    # 計算狀態環的位置，只是微調，為了畫面呈現好看
+    def getRingCoords(self, tagX, tagY):
+        return (
+            tagX - 2,
+            tagY,
+            tagX + self.tagW+1,
+            tagY + 2 + self.tagH
         )
