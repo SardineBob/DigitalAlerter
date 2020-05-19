@@ -35,6 +35,8 @@ class CameraTag(Tag):
         super().__init__(canvas, relocate, pointid, name, x, y, picPhoto, 'camera')
         # 綁定Click事件到全部擁有camera這個tags的物件
         canvas.tag_bind(self.tagid, '<Button-1>', self.__CameraClickEvent)
+        # 攝影機點暫時不用狀態環，先行移除
+        canvas.delete(self.ringid)
 
     # 點擊攝影機Tag的事件，會開啟該攝影機的RTSP影像串流
     def __CameraClickEvent(self, event):
