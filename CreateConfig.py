@@ -4,6 +4,12 @@ import json
 filePath = 'config.ini'
 config = configparser.ConfigParser()
 
+# 產生系統設定參數
+config['SystemConfig'] = {
+    'IsLinkRaspberry': json.dumps(True),  # 連結樹梅派Websocket訊號開關
+    'VideoTime': json.dumps(10),  # 錄影片段時間(以秒為單位，0秒為影片關閉後才停止錄影)
+}
+
 # 產生樹梅派URL位址資料
 config['RaspberryPiWebsocket'] = {
     'device': json.dumps([

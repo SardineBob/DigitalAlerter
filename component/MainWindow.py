@@ -62,18 +62,20 @@ class MainWindow():
         for item in self.__configUtil.cameraPoints:
             self.__cameraTags.append(
                 CameraTag(self.__canvas, self.__windowRelocate, item))
-        # 建立與多台樹梅派的WebSocket連線物件
-        for item in self.__configUtil.RaspberryPis:
-            self.__raspberryPi.append(RaspberryPiSignal(item))
         # 建立保全器材(警報點)與其他組件連結關係
         for item in self.__alertTags:
             # 建立保全器材(警報點)與攝影機的連結關係
             item.linkCamera(self.__cameraTags)
             # 建立保全器材(警報點)與異常紀錄視窗的連結關係
             item.linkAbnormalWindow(self.__openAbnormalWindow)
-        # 建立樹梅派與其他組件的連結關係
-        for item in self.__raspberryPi:
-            item.linkAlert(self.__alertTags)
+        # 設定開啟與樹梅派建立連線時，才去連線，避免開發過程中一直連線
+        if self.__configUtil.SystemConfig.IsLinkRaspberry:
+            # 建立與多台樹梅派的WebSocket連線物件
+            for item in self.__configUtil.RaspberryPis:
+                self.__raspberryPi.append(RaspberryPiSignal(item))
+            # 建立樹梅派與其他組件的連結關係
+            for item in self.__raspberryPi:
+                item.linkAlert(self.__alertTags)
 
         # 給兩個按鈕來測試閃爍
         def click1():
