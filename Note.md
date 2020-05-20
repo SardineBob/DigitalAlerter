@@ -9,3 +9,9 @@
    - 樹梅派自動啟動機制
    - python程式編譯成EXE，方便開啟
    - 開放錄影片段錄影路徑設定
+
+
+# RTSP測試網址
+   - #point = [{"number": 1, "X": 125, "Y": 25, "rtspUrl": "rtsp://192.168.2.126:554/user=admin&password=tlJwpbo6&channel=1&stream=0.sdp?real_stream--rtp-caching=100"}, {"number": 2, "X": 150, "Y": 50, "rtspUrl": "rtsp://192.168.2.126:554/user=admin&password=tlJwpbo6&channel=1&stream=0.sdp?real_stream--rtp-caching=100"}, {"number": 3, "X": 175, "Y": 75, "rtspUrl": "rtsp://192.168.2.126:554/user=admin&password=tlJwpbo6&channel=1&stream=0.sdp?real_stream--rtp-caching=100"}, {"number": 4, "X": 200, "Y": 100, "rtspUrl": "rtsp://192.168.2.126:554/user=admin&password=tlJwpbo6&channel=1&stream=0.sdp?real_stream--rtp-caching=100"}, {"number": 5, "X": 225, "Y": 125, "rtspUrl": "rtsp://192.168.2.126:554/user=admin&password=tlJwpbo6&channel=1&stream=0.sdp?real_stream--rtp-caching=100"}] 
+   - #point = [{"number": 1, "X": 125, "Y": 25, "rtspUrl": "D://test.mp4"}, {"number": 2, "X": 150, "Y": 50, "rtspUrl": "D://test.mp4"}, {"number": 3, "X": 175, "Y": 75, "rtspUrl": "D://test.mp4"}, {"number": 4, "X": 200, "Y": 100, "rtspUrl": "D://test.mp4"}, {"number": 5, "X": 225, "Y": 125, "rtspUrl": "D://test.mp4"}] 
+ 
