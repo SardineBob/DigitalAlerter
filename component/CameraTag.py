@@ -1,6 +1,6 @@
 import tkinter as tk
 from component.Tag import Tag
-from component.RtspWindow import RtspWindow
+from component.RtspBox import RtspBox
 from PIL import Image, ImageTk
 from cv2 import cv2
 import time

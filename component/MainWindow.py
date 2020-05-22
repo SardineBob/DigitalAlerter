@@ -7,6 +7,7 @@ from component.AlertTag import AlertTag
 from component.CameraTag import CameraTag
 from component.RaspberryPiSignal import RaspberryPiSignal
 from component.Abnormal.AbnormalWindow import AbnormalWindow
+from component.RtspWindow import RtspWindow
 
 
 class MainWindow():
@@ -23,6 +24,7 @@ class MainWindow():
     __cameraTags = []
     __raspberryPi = []
     __AbnormalWindow = None
+    __RtspWindow = None
 
     # 測試用
     __window = None
@@ -128,6 +130,12 @@ class MainWindow():
             # self.__window2.Start()
             # self.__window3.Start()
 
+        def click6():
+            self.__openRtspWindow()
+
+        def click7():
+            self.__closeRtspWindow()
+
         button1 = tk.Button(text='啟動', command=click1)
         button1.place(x=10, y=10)
         button2 = tk.Button(text='停止', command=click2)
@@ -138,6 +146,10 @@ class MainWindow():
         button4.place(x=130, y=10)
         button5 = tk.Button(text='關閉報表', command=click5)
         button5.place(x=200, y=10)
+        button4 = tk.Button(text='開啟攝影機畫面', command=click6)
+        button4.place(x=270, y=10)
+        button5 = tk.Button(text='關閉攝影機畫面', command=click7)
+        button5.place(x=370, y=10)
         #button3 = tk.Button(text='播放', command=click3)
         #button3.place(x=90, y=10)
 
@@ -186,3 +198,16 @@ class MainWindow():
         if self.__AbnormalWindow is not None:
             self.__AbnormalWindow.WindowClose()
             self.__AbnormalWindow = None
+
+    # 開啟攝影機畫面視窗
+    def __openRtspWindow(self):
+        if self.__RtspWindow is None:
+            self.__RtspWindow = RtspWindow({
+                "closeMethod": self.__closeRtspWindow
+            })
+
+    # 關閉攝影機畫面視窗
+    def __closeRtspWindow(self):
+        if self.__RtspWindow is not None:
+            self.__RtspWindow.WindowClose()
+            self.__RtspWindow = None
