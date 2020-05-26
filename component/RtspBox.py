@@ -86,29 +86,29 @@ class RtspBox():
         # 連接RTSP串流
         video = cv2.VideoCapture(self.__url)
         # 計算錄影片段尺寸，目前採1/4
-        self.__recordSize = (int(video.get(cv2.CAP_PROP_FRAME_WIDTH) / 4),
-                             int(video.get(cv2.CAP_PROP_FRAME_HEIGHT) / 4))
+        #self.__recordSize = (int(video.get(cv2.CAP_PROP_FRAME_WIDTH) / 4),
+        #                     int(video.get(cv2.CAP_PROP_FRAME_HEIGHT) / 4))
         # 準備錄影路徑與檔名
-        filepath = "CameraRecord"
-        filename = self.__recordFileName
-        if self.__recordFileName is None:
-            nowTime = time.strftime('%Y%m%d%H%M%S', time.localtime())
-            filename = "Camera" + str(self.__tagID) + "-" + nowTime + ".avi"
+        #filepath = "CameraRecord"
+        #filename = self.__recordFileName
+        #if self.__recordFileName is None:
+        #    nowTime = time.strftime('%Y%m%d%H%M%S', time.localtime())
+        #    filename = "Camera" + str(self.__tagID) + "-" + nowTime + ".avi"
         # 準備錄影的相關參數
-        recordForucc = cv2.VideoWriter_fourcc(*self.getSourceFourcc(video))
-        recordFPS = int(video.get(cv2.CAP_PROP_FPS))
+        #recordForucc = cv2.VideoWriter_fourcc(*self.getSourceFourcc(video))
+        #recordFPS = int(video.get(cv2.CAP_PROP_FPS))
         #recordWidth = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
         #recordHeight = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
         # 建立錄影實體物件
-        record = cv2.VideoWriter(
-            filepath + "/" + filename, recordForucc, recordFPS, self.__recordSize)
+        #record = cv2.VideoWriter(
+        #    filepath + "/" + filename, recordForucc, recordFPS, self.__recordSize)
         # 讀取RTSP串流，並撥放與錄影
         (status, frame) = video.read()
         while self.__active and status:
             (status, frame) = video.read()
             # resize frame
             frame = cv2.resize(frame, self.__boxSize)
-            record.write(frame)  # 錄製影片到檔案
+            #record.write(frame)  # 錄製影片到檔案
             imgArray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
             image = Image.fromarray(imgArray)
             photo = ImageTk.PhotoImage(image=image)
@@ -117,7 +117,7 @@ class RtspBox():
                     image=photo, width=photo.width(), height=photo.height())
                 self.__box.rtspImage = photo
         video.release()
-        record.release()
+        #record.release()
 
     # 因應視窗縮放，根據縮放比例重新定位視窗位置
     # def Relocate(self):
@@ -154,18 +154,19 @@ class RtspBox():
 
     # RTSP視窗雙擊事件
     def __DoubleClickEvent(self, event):
-        self.__closeMethod()
+        #self.__closeMethod()
+        self.Stop()
 
     # 設定與該RTSP Window對應的Camera Tag座標位置
     # def SetCameraTagCoords(self, X, Y):
     #    self.__tagX = X
     #    self.__tagY = Y
 
-    # 取得來源RTSP影像的編碼
-    def getSourceFourcc(self, sourceVideo):
-        code = sourceVideo.get(cv2.CAP_PROP_FOURCC)
-        code = "".join([chr((int(code) >> 8 * i) & 0xFF) for i in range(4)])
-        return code
+    ## 取得來源RTSP影像的編碼
+    #def getSourceFourcc(self, sourceVideo):
+    #    code = sourceVideo.get(cv2.CAP_PROP_FOURCC)
+    #    code = "".join([chr((int(code) >> 8 * i) & 0xFF) for i in range(4)])
+    #    return code
 
     # 提供父容器設定這格RTSP影像尺寸
     def setBoxSize(self, size):

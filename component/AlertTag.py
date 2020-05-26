@@ -4,6 +4,7 @@ import time
 import threading
 from datetime import datetime
 from utilset.AbnormalUtil import AbnormalUtil
+from component.RtspRecord import RtspRecord
 
 # 背景圓：平常為綠色，警報發生時，呈現紅色閃爍
 # 狀態環：識別樹梅派WebSocket訊號是否連結的呈現(紅色：未連結，藍色：已連結)
@@ -49,11 +50,14 @@ class AlertTag(Tag):
             cameraInfo = []
             # 觸發啟動攝影機動作
             for camera in self.__cameraMappingTag:
+                # 開啟攝影機畫面
+                camera.openRtsp()
+                # 觸發錄影動作
                 filename = nowTime.strftime('%Y%m%d%H%M%S') + \
                     "-Alert" + str(self.pointid) + \
                     "-Camera" + str(camera.pointid) + ".avi"
-                camera.SetRecordFileName(filename)
-                camera.openRtsp()
+                RtspRecord({'cameraTagID': camera.pointid,
+                            'recordFileName': filename})
                 # 蒐集錄影檔名，準備寫入DB
                 cameraInfo.append({
                     'cameraID': camera.pointid,

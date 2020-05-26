@@ -48,48 +48,48 @@ class RtspWindow():
             'cameraTagID': 1,
             'recordFileName': 'test.avi'}))
 
-        self.__rtspBox.append(RtspBox({
-            'root': self.__window,
-            'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
-            'closeMethod': self.WindowClose,
-            'cameraTagID': 2,
-            'recordFileName': 'test.avi'}))
-        self.__rtspBox.append(RtspBox({
-           'root': self.__window,
-           'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
-           'closeMethod': self.WindowClose,
-           'cameraTagID': 3,
-           'recordFileName': 'test.avi'}))
-        self.__rtspBox.append(RtspBox({
-           'root': self.__window,
-           'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
-           'closeMethod': self.WindowClose,
-           'cameraTagID': 4,
-           'recordFileName': 'test.avi'}))
-        self.__rtspBox.append(RtspBox({
-           'root': self.__window,
-           'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
-           'closeMethod': self.WindowClose,
-           'cameraTagID': 5,
-           'recordFileName': 'test.avi'}))
-        self.__rtspBox.append(RtspBox({
-           'root': self.__window,
-           'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
-           'closeMethod': self.WindowClose,
-           'cameraTagID': 6,
-           'recordFileName': 'test.avi'}))
-        self.__rtspBox.append(RtspBox({
-           'root': self.__window,
-           'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
-           'closeMethod': self.WindowClose,
-           'cameraTagID': 7,
-           'recordFileName': 'test.avi'}))
-        self.__rtspBox.append(RtspBox({
-           'root': self.__window,
-           'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
-           'closeMethod': self.WindowClose,
-           'cameraTagID': 8,
-           'recordFileName': 'test.avi'}))
+        # self.__rtspBox.append(RtspBox({
+        #     'root': self.__window,
+        #     'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
+        #     'closeMethod': self.WindowClose,
+        #     'cameraTagID': 2,
+        #     'recordFileName': 'test.avi'}))
+        # self.__rtspBox.append(RtspBox({
+        #    'root': self.__window,
+        #    'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
+        #    'closeMethod': self.WindowClose,
+        #    'cameraTagID': 3,
+        #    'recordFileName': 'test.avi'}))
+        # self.__rtspBox.append(RtspBox({
+        #    'root': self.__window,
+        #    'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
+        #    'closeMethod': self.WindowClose,
+        #    'cameraTagID': 4,
+        #    'recordFileName': 'test.avi'}))
+        # self.__rtspBox.append(RtspBox({
+        #    'root': self.__window,
+        #    'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
+        #    'closeMethod': self.WindowClose,
+        #    'cameraTagID': 5,
+        #    'recordFileName': 'test.avi'}))
+        # self.__rtspBox.append(RtspBox({
+        #    'root': self.__window,
+        #    'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
+        #    'closeMethod': self.WindowClose,
+        #    'cameraTagID': 6,
+        #    'recordFileName': 'test.avi'}))
+        # self.__rtspBox.append(RtspBox({
+        #    'root': self.__window,
+        #    'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
+        #    'closeMethod': self.WindowClose,
+        #    'cameraTagID': 7,
+        #    'recordFileName': 'test.avi'}))
+        # self.__rtspBox.append(RtspBox({
+        #    'root': self.__window,
+        #    'url': 'rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov',
+        #    'closeMethod': self.WindowClose,
+        #    'cameraTagID': 8,
+        #    'recordFileName': 'test.avi'}))
         for item in self.__rtspBox:
             idx = self.__rtspBox.index(item)
             (seat, size) = self.__getBoxLayoutGrid(idx)

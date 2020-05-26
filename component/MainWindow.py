@@ -81,7 +81,7 @@ class MainWindow():
 
         # 給兩個按鈕來測試閃爍
         def click1():
-            self.__alertTags[2].TriggerAlert()
+            self.__alertTags[4].TriggerAlert()
 
         def click2():
             for tag in self.__alertTags:
