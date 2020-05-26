@@ -9,8 +9,8 @@ from component.RtspLinkLine import RtspLinkLine
 class RtspBox():
 
     __root = None
-    __window = None
-    #__seat = None  # 這個RtspBox的在Window上的座位，從外部給予
+    __box = None
+    # __seat = None  # 這個RtspBox的在Window上的座位，從外部給予
     __url = None
     # __coordX = 0  # 視窗在frame容器中的座標
     #__coordY = 0
@@ -47,17 +47,17 @@ class RtspBox():
         #self.__tagY = para["cameraTagY"]
         self.__recordFileName = para["recordFileName"]
         # 建立承載RTSP影像串流的容器物件
-        self.__window = tk.Label(
+        self.__box = tk.Label(
             self.__root, bg="black", width=self.__width, height=self.__height)
         # 放置在畫面上
-        # self.__window.place(
+        # self.__box.place(
         #    x=self.__coordX, y=self.__coordY, anchor='nw')
         # 註冊RTSP視窗點擊事件
-        #self.__window.bind('<Button-1>', self.__ClickEvent)
+        #self.__box.bind('<Button-1>', self.__ClickEvent)
         # 註冊RTSP視窗拖移事件
-        #self.__window.bind('<B1-Motion>', self.__DragEvent)
+        #self.__box.bind('<B1-Motion>', self.__DragEvent)
         # 註冊RTSP視窗雙擊事件(關閉視窗)
-        self.__window.bind('<Double-Button-1>', self.__DoubleClickEvent)
+        self.__box.bind('<Double-Button-1>', self.__DoubleClickEvent)
         self.Start()
         # 產生一條連接線物件
         #self.__linkLine = RtspLinkLine(self.__canvas)
@@ -76,8 +76,8 @@ class RtspBox():
     def Stop(self):
         self.__active = False
         self.__task = None  # 停止，執行序清掉(等待python程序GC)，以利下一次觸發
-        self.__window.destroy()  # 銷毀
-        self.__window = None
+        self.__box.destroy()  # 銷毀
+        self.__box = None
         # self.__linkLine.DropLinkLine()  # 移除連接線
         #self.__linkLine = None
 
@@ -112,23 +112,23 @@ class RtspBox():
             imgArray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
             image = Image.fromarray(imgArray)
             photo = ImageTk.PhotoImage(image=image)
-            if hasattr(self.__window, 'configure') is True:
-                self.__window.configure(
+            if hasattr(self.__box, 'configure') is True:
+                self.__box.configure(
                     image=photo, width=photo.width(), height=photo.height())
-                self.__window.rtspImage = photo
+                self.__box.rtspImage = photo
         video.release()
         record.release()
 
     # 因應視窗縮放，根據縮放比例重新定位視窗位置
     # def Relocate(self):
-    #    if self.__window is None:
+    #    if self.__box is None:
     #        return
     #    # 取得因為視窗縮放產生的新座標
     #    result = self.__relocate.Relocate(self.__coordX, self.__coordY)
     #    newX = result["newX"]
     #    newY = result["newY"]
     #    # 重新定位RTSP Window的位置
-    #    self.__window.place(x=newX, y=newY, anchor='nw')
+    #    self.__box.place(x=newX, y=newY, anchor='nw')
     #    # 同步relocate連接線的位置
     #    self.__linkLine.Relocate(
     #        self.__tagX, self.__tagY, newX, newY)
@@ -167,10 +167,11 @@ class RtspBox():
         code = "".join([chr((int(code) >> 8 * i) & 0xFF) for i in range(4)])
         return code
 
-    # 提供父容器設定一格RTSP影像尺寸
-    def setBoxSize(self, width, height):
-        self.__boxSize = (width, height)
+    # 提供父容器設定這格RTSP影像尺寸
+    def setBoxSize(self, size):
+        self.__boxSize = size
 
-    # 提供父容器設定這格RTSP影像在Grid的layout分布是哪一個位置
-    def setBoxGrid(self, seat):
-        self.__window.grid(seat)
+    # 提供父容器設定這格RTSP影像在Grid的layout分布是哪一個位置，以及這格RTSP影像大小
+    def setBoxGrid(self, seat, size):
+        self.__box.grid(seat)
+        self.__boxSize = size
