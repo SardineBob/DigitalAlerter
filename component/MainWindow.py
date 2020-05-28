@@ -95,7 +95,7 @@ class MainWindow():
             # self.__alertTags[2].TriggerStop()
             # for item in self.__cameraTags:
             #    item.RtspStop()
-            self.__test.closeTask()
+            #self.__test.closeTask()
 
         def click3():
             self.__test = RaspberryPiSignal(self.__alertTags)

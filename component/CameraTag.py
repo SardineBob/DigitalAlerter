@@ -36,19 +36,19 @@ class CameraTag(Tag):
     # 點擊攝影機Tag的事件，會開啟該攝影機的RTSP影像串流
     def __CameraClickEvent(self, event):
         if self.__rtspIsOpen is False:
-            self.__openRtspBox()
+            self.openRtspBox()
         else:
-            self.__closeRtspBox()
+            self.closeRtspBox()
 
     # 開啟RtspBox動作
-    def __openRtspBox(self):
+    def openRtspBox(self):
         self.__rtspWindow.OpenRtspBox(self.pointid)
         self.__rtspIsOpen = True
         # 變化CameraTag背景顏色，說明攝影機畫面啟動中(目前採用藍色)
         self.canvas.itemconfig(self.bgid, fill='#0000ff')
 
     # 關閉RtspBox動作
-    def __closeRtspBox(self):
+    def closeRtspBox(self):
         self.__rtspWindow.CloseRtspBox(self.pointid)
         self.setRtspIsClose()
 

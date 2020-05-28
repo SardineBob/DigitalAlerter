@@ -83,7 +83,9 @@ class RtspWindow():
         rtspBoxs = self.__rtspBox.copy()
         for item in rtspBoxs:
             self.__CloseRtspBox(item.tagID)
-        self.__window.destroy()
+        # 銷毀視窗物件
+        if self.__window is not None:
+            self.__window.destroy()
         self.__window = None
 
     # 視窗縮放大小時，觸發事件處理包含RTSP影像大小異動等動作

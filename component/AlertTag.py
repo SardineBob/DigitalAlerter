@@ -51,7 +51,7 @@ class AlertTag(Tag):
             # 觸發啟動攝影機動作
             for camera in self.__cameraMappingTag:
                 # 開啟攝影機畫面
-                camera.openRtsp()
+                camera.openRtspBox()
                 # 觸發錄影動作
                 filename = nowTime.strftime('%Y%m%d%H%M%S') + \
                     "-Alert" + str(self.pointid) + \
@@ -79,7 +79,7 @@ class AlertTag(Tag):
         self.__task = None  # 停止閃爍，執行序清掉(等待python程序GC)，以利下一次觸發
         # 觸發關閉攝影機動作
         for camera in self.__cameraMappingTag:
-            camera.closeRtsp()
+            camera.closeRtspBox()
 
     # 執行背景閃爍的特效(紅綠背景互換)
     def __TagFlicker(self):
