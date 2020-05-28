@@ -17,7 +17,7 @@ class RtspRecord():
     def __init__(self, para):
         # 取出需用到的設定值
         self.__tagID = para["cameraTagID"]
-        self.__url = self.__getConfigItem(self.__tagID)['rtspUrl']
+        self.__url = ConfigUtil().getCameraPoint(self.__tagID)['rtspUrl']
         self.__recordFileName = para["recordFileName"]
         # 建立執行序並開始錄影
         self.Start()
@@ -78,9 +78,3 @@ class RtspRecord():
         code = sourceVideo.get(cv2.CAP_PROP_FOURCC)
         code = "".join([chr((int(code) >> 8 * i) & 0xFF) for i in range(4)])
         return code
-
-    # get config item from camera tag id
-    def __getConfigItem(self, cameraTagID):
-        for item in ConfigUtil().cameraPoints:
-            if(item['number'] is cameraTagID):
-                return item
