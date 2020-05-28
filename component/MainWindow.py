@@ -7,6 +7,7 @@ from component.AlertTag import AlertTag
 from component.CameraTag import CameraTag
 from component.RaspberryPiSignal import RaspberryPiSignal
 from component.Abnormal.AbnormalWindow import AbnormalWindow
+from component.RtspWindow import RtspWindow
 
 
 class MainWindow():
@@ -23,6 +24,7 @@ class MainWindow():
     __cameraTags = []
     __raspberryPi = []
     __AbnormalWindow = None
+    __RtspWindow = None
 
     # 測試用
     __window = None
@@ -54,6 +56,9 @@ class MainWindow():
             'oriMapWidth': self.__map.mapOriginWidth,
             'oriMapHeight': self.__map.mapOriginHeight
         })
+        # 產生RTSP視窗物件
+        self.__RtspWindow = RtspWindow()
+        self.__RtspWindow.SetCameraTag(self.__cameraTags)
         # 產生保全器材(警報點)標籤位置
         for item in self.__configUtil.AlertPoints:
             self.__alertTags.append(
@@ -68,6 +73,9 @@ class MainWindow():
             item.linkCamera(self.__cameraTags)
             # 建立保全器材(警報點)與異常紀錄視窗的連結關係
             item.linkAbnormalWindow(self.__openAbnormalWindow)
+        # 建立攝影機與RTSP視窗的連結關係
+        for item in self.__cameraTags:
+            item.linkRtspWindow(self.__RtspWindow)
         # 設定開啟與樹梅派建立連線時，才去連線，避免開發過程中一直連線
         if self.__configUtil.SystemConfig.IsLinkRaspberry:
             # 建立與多台樹梅派的WebSocket連線物件
@@ -79,7 +87,7 @@ class MainWindow():
 
         # 給兩個按鈕來測試閃爍
         def click1():
-            self.__alertTags[2].TriggerAlert()
+            self.__alertTags[4].TriggerAlert()
 
         def click2():
             for tag in self.__alertTags:
@@ -128,6 +136,12 @@ class MainWindow():
             # self.__window2.Start()
             # self.__window3.Start()
 
+        # def click6():
+            # self.__openRtspBox()
+
+        # def click7():
+            # self.__closeRtspWindow()
+
         button1 = tk.Button(text='啟動', command=click1)
         button1.place(x=10, y=10)
         button2 = tk.Button(text='停止', command=click2)
@@ -138,6 +152,10 @@ class MainWindow():
         button4.place(x=130, y=10)
         button5 = tk.Button(text='關閉報表', command=click5)
         button5.place(x=200, y=10)
+        #button4 = tk.Button(text='開啟攝影機畫面', command=click6)
+        #button4.place(x=270, y=10)
+        #button5 = tk.Button(text='關閉攝影機畫面', command=click7)
+        #button5.place(x=370, y=10)
         #button3 = tk.Button(text='播放', command=click3)
         #button3.place(x=90, y=10)
 

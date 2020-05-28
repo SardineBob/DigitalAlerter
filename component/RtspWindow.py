@@ -1,162 +1,129 @@
 import tkinter as tk
-from PIL import Image, ImageTk
-from cv2 import cv2
-import threading
-import time
-from component.RtspLinkLine import RtspLinkLine
+from component.Abnormal.QueryBar import QueryBar
+from component.Abnormal.AbnormalTable import AbnormalTable
+from component.Abnormal.VideoList import VideoList
+from component.RtspBox import RtspBox
+from component.RtspBoxLayout import RtspBoxLayout
 
 
 class RtspWindow():
 
     __window = None
-    __url = None
-    __coordX = 0  # 視窗在frame容器中的座標
-    __coordY = 0
-    __width = 10
-    __height = 5
-    __task = None
-    __active = False
-    # __relocatePara = None  # 視窗resize時，所傳入的參數，記錄下來，移動RTSP Window時，需要將座標根據縮放比例重新計算
-    __preMoveCoordX = 0  # 紀錄RTSP視窗拖移時，前一次的XY座標(計算拖移量用)
-    __preMoveCoordY = 0
-    __closeMethod = None  # RTSP視窗關閉的方法，包含tag的開關狀態控制異動
-    __canvas = None  # 繪製連接線的畫布物件
-    __relocate = None  # 視窗異動而座標重新定位的物件
-    __tagID = None  # Camera Tag ID Number
-    __tagX = None  # tag的座標位置，繪製連接線使用
-    __tagY = None
-    __linkLine = None  # Tag與RTSP視窗的連接線
-    __recordFileName = None  # 從外界傳入的錄影檔名，該參數None時，系統自動預設
-    __frameSize = (480, 270)  # 定義一個frame要縮小到多少尺寸
+    __width = 640  # 目前視窗寬度
+    __height = 480  # 目前視窗高度
+    __padx = 5  # 每格影像間，X軸間格pixel
+    __pady = 5  # 每格影像間，Y軸間格pixel
+    __rtspBox = []  # 目前開啟中RTSP影像物件
+    __cameraTags = []  # 目前存在的所有Camera Point資料
 
-    def __init__(self, para):
-        # 取出需用到的設定值
-        self.__url = para["url"]
-        self.__coordX = para["x"]
-        self.__coordY = para["y"]
-        self.__closeMethod = para["closeMethod"]
-        self.__canvas = para["canvas"]
-        self.__relocate = para["relocate"]
-        self.__tagID = para["cameraTagID"]
-        self.__tagX = para["cameraTagX"]
-        self.__tagY = para["cameraTagY"]
-        self.__recordFileName = para["recordFileName"]
-        # 建立承載RTSP影像串流的容器物件
-        self.__window = tk.Label(
-            bg="black", width=self.__width, height=self.__height)
-        # 放置在畫面上
-        self.__window.place(
-            x=self.__coordX, y=self.__coordY, anchor='nw')
-        # 註冊RTSP視窗點擊事件
-        self.__window.bind('<Button-1>', self.__ClickEvent)
-        # 註冊RTSP視窗拖移事件
-        self.__window.bind('<B1-Motion>', self.__DragEvent)
-        # 註冊RTSP視窗雙擊事件(關閉視窗)
-        self.__window.bind('<Double-Button-1>', self.__DoubleClickEvent)
-        # 產生一條連接線物件
-        self.__linkLine = RtspLinkLine(self.__canvas)
-        self.__linkLine.DrawLinkLine(
-            self.__tagX, self.__tagY, self.__coordX, self.__coordY)
+    # 開啟RTSP影像串流視窗
+    def __OpenRtspWindow(self):
+        # 開始建立一個子視窗
+        self.__window = tk.Toplevel()
+        self.__window.geometry(
+            "{}x{}+50+50".format(self.__width, self.__height))
+        # 註冊視窗關閉事件，使用者點擊視窗的X，會觸發
+        self.__window.protocol("WM_DELETE_WINDOW", self.__WindowClose)
+        # 設定Grid版面配置比例(最外層主要容器)
+        self.__window.grid_columnconfigure(0, weight=1)
+        self.__window.grid_columnconfigure(1, weight=1)
+        self.__window.grid_columnconfigure(2, weight=1)
+        self.__window.grid_columnconfigure(3, weight=1)
+        self.__window.grid_rowconfigure(0, weight=1)
+        self.__window.grid_rowconfigure(1, weight=1)
+        # 註冊視窗Resize觸發的事件(同時修正RTSP影像大小)
+        self.__window.bind("<Configure>", self.__WindowResize)
 
-    # 開始播放RTSP影像串流(建立一個執行序來跑，以免畫面Lock)
-    def Start(self):
-        if self.__task is None:
-            self.__task = threading.Thread(target=self.__Play)
-            self.__task.setDaemon(True)
-            self.__active = True
-            self.__task.start()
+    # 開啟指定的攝影機RTSP影像串流
+    def OpenRtspBox(self, cameraTagID):
+        # 若開啟第一格RTSP影像，則觸發開啟視窗
+        if len(self.__rtspBox) <= 0:
+            self.__OpenRtspWindow()
+        # 開啟RTSP影像串流
+        self.__rtspBox.append(RtspBox({
+            'root': self.__window,
+            'cameraTagID': cameraTagID,
+            'closeMethod': self.CloseRtspBox
+        }))
+        # 重新配置版面
+        self.__ResetPanel()
 
-    # 停止播放RTSP串流，並銷毀執行序(需等待python程序GC)
-    def Stop(self):
-        self.__active = False
-        self.__task = None  # 停止，執行序清掉(等待python程序GC)，以利下一次觸發
-        self.__window.destroy()  # 銷毀
+    # 關閉指定攝影機RTSP影像串流
+    def CloseRtspBox(self, cameraTagID):
+        # 執行關閉程序
+        self.__CloseRtspBox(cameraTagID)
+        # 判斷若關閉RTSP Box一格不剩，則關閉整個視窗
+        if len(self.__rtspBox) <= 0:
+            self.__WindowClose()
+
+    # 關閉指定RTSP影像串流，包含Tag狀態旗標重置、RTSP串流執行序銷毀以及移除RTSP Box陣列
+    def __CloseRtspBox(self, cameraTagID):
+        # 先找到這個cameraTagID的item，停止RTSP串流執行序後移除
+        for item in self.__rtspBox:
+            if item.tagID is cameraTagID:
+                item.Stop()
+                self.__rtspBox.remove(item)
+                # 重新配置版面
+                self.__ResetPanel()
+        # 找到CameraTag本體，執行將開啟RTSP的旗標重製動作
+        for item in self.__cameraTags:
+            if item.pointid is cameraTagID:
+                item.setRtspIsClose()
+
+    # 根據開啟或關閉的Rtsp Box數量，重新配置版面
+    def __ResetPanel(self):
+        for item in self.__rtspBox:
+            idx = self.__rtspBox.index(item)
+            (seat, size) = self.__getBoxLayoutGrid(idx)
+            self.__rtspBox[idx].setBoxGrid(seat, size)
+
+    # 視窗關閉，用於外部呼叫
+    def __WindowClose(self):
+        # 關閉視窗時，清除所有開啟中的RtspBox
+        rtspBoxs = self.__rtspBox.copy()
+        for item in rtspBoxs:
+            self.__CloseRtspBox(item.tagID)
+        self.__window.destroy()
         self.__window = None
-        self.__linkLine.DropLinkLine()  # 移除連接線
-        self.__linkLine = None
 
-    # 執行RTSP影像串流播放的動作
-    def __Play(self):
-        # 連接RTSP串流
-        video = cv2.VideoCapture(self.__url)
-        # 設定一個frame的尺寸
-        self.__frameSize = (int(video.get(cv2.CAP_PROP_FRAME_WIDTH) / 4),
-                            int(video.get(cv2.CAP_PROP_FRAME_HEIGHT) / 4))
-        # 準備錄影路徑與檔名
-        filepath = "CameraRecord"
-        filename = self.__recordFileName
-        if self.__recordFileName is None:
-            nowTime = time.strftime('%Y%m%d%H%M%S', time.localtime())
-            filename = "Camera" + str(self.__tagID) + "-" + nowTime + ".avi"
-        # 準備錄影的相關參數
-        recordForucc = cv2.VideoWriter_fourcc(*self.getSourceFourcc(video))
-        recordFPS = int(video.get(cv2.CAP_PROP_FPS))
-        #recordWidth = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
-        #recordHeight = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-        # 建立錄影實體物件
-        record = cv2.VideoWriter(
-            filepath + "/" + filename, recordForucc, recordFPS, self.__frameSize)
-        # 讀取RTSP串流，並撥放與錄影
-        (status, frame) = video.read()
-        while self.__active and status:
-            (status, frame) = video.read()
-            # resize frame
-            frame = cv2.resize(frame, self.__frameSize)
-            record.write(frame)  # 錄製影片到檔案
-            imgArray = cv2.cvtColor(frame, cv2.COLOR_BGR2RGBA)
-            image = Image.fromarray(imgArray)
-            photo = ImageTk.PhotoImage(image=image)
-            if hasattr(self.__window, 'configure') is True:
-                self.__window.configure(
-                    image=photo, width=photo.width(), height=photo.height())
-                self.__window.rtspImage = photo
-        video.release()
-        record.release()
+    # 視窗縮放大小時，觸發事件處理包含RTSP影像大小異動等動作
+    def __WindowResize(self, event):
+        # 判斷事件是主要視窗所觸發
+        if str(event.widget) == '.!toplevel':
+            # 判斷變動主要視窗寬高的操作
+            if self.__width != event.width or self.__height != event.height:
+                # 更新目前視窗寬高
+                self.__width = event.width
+                self.__height = event.height
+                # 更新所有開啟的影像大小
+                for item in self.__rtspBox:
+                    idx = self.__rtspBox.index(item)
+                    item.setBoxSize(self.__getBoxSize(idx))
 
-    # 因應視窗縮放，根據縮放比例重新定位視窗位置
-    def Relocate(self):
-        if self.__window is None:
-            return
-        # 取得因為視窗縮放產生的新座標
-        result = self.__relocate.Relocate(self.__coordX, self.__coordY)
-        newX = result["newX"]
-        newY = result["newY"]
-        # 重新定位RTSP Window的位置
-        self.__window.place(x=newX, y=newY, anchor='nw')
-        # 同步relocate連接線的位置
-        self.__linkLine.Relocate(
-            self.__tagX, self.__tagY, newX, newY)
+    # 根據目前開啟的影像數量，計算該格的Grid版面配置的參數以及計算影像長寬(最多8格)
+    def __getBoxLayoutGrid(self, whichGrid):
+        # 根據目前已開啟的影像數量，來做版面上的排列
+        openBoxCnt = len(self.__rtspBox)
+        # 根據目前開啟的影像數量，指定格數，取出對應的配置參數
+        seat = RtspBoxLayout[openBoxCnt-1][whichGrid]
+        # 加入一些固定的參數
+        seat['sticky'] = 'EWNS'
+        seat['padx'] = self.__padx
+        seat['pady'] = self.__pady
+        # 計算這格影像大小
+        boxSize = self.__getBoxSize(whichGrid)
+        # 回傳配置參數
+        return (seat, boxSize)
 
-    # RTSP視窗點擊事件
-    def __ClickEvent(self, event):
-        self.__preMoveCoordX = event.x
-        self.__preMoveCoordY = event.y
+    # 根據目前視窗大小，計算每個影像大小(根據開啟影像數量與格子位置為了版面配置有不同大小)
+    def __getBoxSize(self, whichGrid):
+        # 取得每格影像的設定參數
+        seat = RtspBoxLayout[len(self.__rtspBox)-1][whichGrid]
+        # 計算影像大小
+        boxWidth = int((self.__width / 4) * seat['columnspan'] - self.__padx)
+        boxHeight = int((self.__height / 2) * seat['rowspan'] - self.__pady)
+        return (boxWidth, boxHeight)
 
-    # RTSP視窗拖移事件
-    def __DragEvent(self, event):
-        # 這個移動的座標是window內部的，基準點也就是window左上角為(0,0)
-        moveInWindowX = event.x
-        moveInWindowY = event.y
-        # 這個座標是RTSP視窗在frame容器中的座標位置
-        newX = self.__coordX + (moveInWindowX - self.__preMoveCoordX)
-        newY = self.__coordY + (moveInWindowY - self.__preMoveCoordY)
-        # 更新RTSP視窗目前座標
-        self.__coordX = newX
-        self.__coordY = newY
-        # 重新定位要移動的新座標
-        self.Relocate()
-
-    # RTSP視窗雙擊事件
-    def __DoubleClickEvent(self, event):
-        self.__closeMethod()
-
-    # 設定與該RTSP Window對應的Camera Tag座標位置
-    def SetCameraTagCoords(self, X, Y):
-        self.__tagX = X
-        self.__tagY = Y
-
-    # 取得來源RTSP影像的編碼
-    def getSourceFourcc(self, sourceVideo):
-        code = sourceVideo.get(cv2.CAP_PROP_FOURCC)
-        code = "".join([chr((int(code) >> 8 * i) & 0xFF) for i in range(4)])
-        return code
+    # 提供外部設定所有存在的CameraTag資料
+    def SetCameraTag(self, cameraTags):
+        self.__cameraTags = cameraTags

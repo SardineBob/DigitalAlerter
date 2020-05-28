@@ -30,6 +30,12 @@ class ConfigUtil():
         # 讀取樹梅派Websocket位址
         self.RaspberryPis = json.loads(config["RaspberryPiWebsocket"]["device"])
 
+    # 根據Point ID取得Camera Point Config Item
+    def getCameraPoint(self, pointID):
+        for item in self.cameraPoints:
+            if(item['number'] is pointID):
+                return item
+
 
 # 設定檔中，系統參數設定存取元件
 class SystemConfig():
