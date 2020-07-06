@@ -3,3 +3,6 @@
 
 # 安裝Sqllite3
 ## pip install pysqlite3
+
+# 安裝PIL
+## pip install Pillow
